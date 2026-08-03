@@ -45,7 +45,6 @@
             display: flex;
             justify-content: center;
             transition: all 0.4s ease;
-            margin-bottom: 20px;
         }
 
         /* Web 模式外框 */
@@ -67,8 +66,8 @@
             border-radius: 0;
             box-shadow: none;
             border: none;
-            min-height: calc(100vh - 80px);
-            height: calc(100vh - 80px);
+            min-height: 100vh;
+            height: 100vh;
             overflow: hidden;
             position: fixed;
             top: 0;
@@ -134,6 +133,38 @@
             box-shadow: 0 4px 12px rgba(74, 144, 226, 0.2);
         }
 
+        /* 放在 Web 側邊欄最下方的切換按鈕 */
+        .sidebar-switcher {
+            margin-top: auto;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .sidebar-switch-btn {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            color: var(--primary);
+            padding: 10px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+
+        .sidebar-switch-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
         /* 主內容區 */
         .main-content {
             flex: 1;
@@ -149,7 +180,7 @@
             display: none;
             background: #ffffff;
             border-top: 1px solid var(--border-color);
-            padding: 10px 16px;
+            padding: 10px 12px;
             justify-content: space-around;
             align-items: center;
             box-shadow: 0 -4px 10px rgba(0,0,0,0.03);
@@ -161,7 +192,7 @@
             flex-direction: column;
             align-items: center;
             gap: 4px;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: var(--text-sub);
             cursor: pointer;
             font-weight: 600;
@@ -173,7 +204,7 @@
         }
 
         .mobile-tab-item span.icon {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
         }
 
         /* 頁面內容通用樣式 */
@@ -307,52 +338,6 @@
             background: var(--primary-hover);
         }
 
-        /* 最底部的全域模式切換列 (統一放在最下方) */
-        .global-bottom-switcher {
-            display: flex;
-            gap: 12px;
-            background: #ffffff;
-            padding: 10px 20px;
-            border-radius: 30px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border-color);
-            align-items: center;
-            justify-content: center;
-            width: fit-content;
-            margin: 0 auto;
-        }
-
-        /* 手機模式專屬的底部固定切換列 */
-        .app-container.mobile-mode ~ .global-bottom-switcher {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            border-radius: 0;
-            border-top: 1px solid var(--border-color);
-            box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
-            z-index: 1001;
-            padding: 12px 16px;
-            background: #ffffff;
-        }
-
-        .mode-btn {
-            background: transparent;
-            border: none;
-            padding: 8px 18px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: 700;
-            color: var(--text-sub);
-            transition: all 0.3s ease;
-        }
-
-        .mode-btn.active {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
-        }
-
         /* 切換手機模式時的排版調整 */
         .app-container.mobile-mode .sidebar {
             display: none !important;
@@ -369,7 +354,6 @@
         @media (max-width: 768px) {
             body {
                 padding: 0;
-                padding-bottom: 60px; /* 預留底部切換列空間 */
             }
         }
     </style>
@@ -402,8 +386,12 @@
                         <span>📅</span> 發售行事曆
                     </li>
                 </ul>
-                <div style="font-size: 0.8rem; color: var(--text-sub); text-align: center; padding-top: 10px;">
-                    v2.0.0 Supabase Edition
+
+                <!-- Web 版放在左側導覽列最下方的切換按鈕 -->
+                <div class="sidebar-switcher">
+                    <button class="sidebar-switch-btn" onclick="switchMode('mobile')">
+                        <span>📱</span> 切換手機滿版模式
+                    </button>
                 </div>
             </div>
 
@@ -506,7 +494,7 @@
             </div>
         </div>
 
-        <!-- 手機模式專屬底部導覽列 -->
+        <!-- 手機模式專屬底部導覽列（包含切換回 Web 版的按鈕） -->
         <div class="mobile-tabbar">
             <div class="mobile-tab-item active" onclick="switchTab('dashboard', this)">
                 <span class="icon">📊</span>
@@ -528,14 +516,12 @@
                 <span class="icon">📅</span>
                 <span>行事曆</span>
             </div>
+            <!-- 手機版專屬切換按鈕放在底部導覽列最右側 -->
+            <div class="mobile-tab-item" onclick="switchMode('web')" style="color: var(--primary);">
+                <span class="icon">💻</span>
+                <span>Web版</span>
+            </div>
         </div>
-    </div>
-
-    <!-- 統一放在最下方的模式切換列 -->
-    <div class="global-bottom-switcher">
-        <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-sub);">顯示模式：</span>
-        <button class="mode-btn active" onclick="switchMode('web')">💻 Web 寬螢幕</button>
-        <button class="mode-btn" onclick="switchMode('mobile')">📱 手機滿版</button>
     </div>
 
     <script>
@@ -675,16 +661,11 @@
             ========================================== */
         function switchMode(mode) {
             const container = document.getElementById('appContainer');
-            const btns = document.querySelectorAll('.global-bottom-switcher .mode-btn');
-            
-            btns.forEach(btn => btn.classList.remove('active'));
             
             if (mode === 'web') {
                 container.className = 'app-container web-mode';
-                if(btns[0]) btns[0].classList.add('active');
             } else {
                 container.className = 'app-container mobile-mode';
-                if(btns[1]) btns[1].classList.add('active');
             }
         }
 
@@ -698,7 +679,11 @@
             navItems.forEach(item => item.classList.remove('active'));
             
             const mobileTabs = document.querySelectorAll('.mobile-tabbar .mobile-tab-item');
-            mobileTabs.forEach(item => item.classList.remove('active'));
+            mobileTabs.forEach(item => {
+                if(!item.getAttribute('onclick').includes("switchMode")) {
+                    item.classList.remove('active');
+                }
+            });
 
             if (element.classList.contains('nav-item')) {
                 element.classList.add('active');
@@ -706,7 +691,7 @@
                 if (index !== -1 && mobileTabs[index]) {
                     mobileTabs[index].classList.add('active');
                 }
-            } else if (element.classList.contains('mobile-tab-item')) {
+            } else if (element.classList.contains('mobile-tab-item') && !element.getAttribute('onclick').includes("switchMode")) {
                 element.classList.add('active');
                 const index = Array.from(mobileTabs).indexOf(element);
                 if (index !== -1 && navItems[index]) {
