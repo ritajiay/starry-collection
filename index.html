@@ -39,41 +39,13 @@
             padding: 20px;
         }
 
-        /* 頂部模式切換列 (僅在 Web 模式顯示) */
-        .mode-switcher {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
-            background: #ffffff;
-            padding: 8px 16px;
-            border-radius: 30px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border-color);
-        }
-
-        .mode-btn {
-            background: transparent;
-            border: none;
-            padding: 8px 18px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: 700;
-            color: var(--text-sub);
-            transition: all 0.3s ease;
-        }
-
-        .mode-btn.active {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
-        }
-
         /* 容器切換核心 */
         .app-container {
             width: 100%;
             display: flex;
             justify-content: center;
             transition: all 0.4s ease;
+            margin-bottom: 20px;
         }
 
         /* Web 模式外框 */
@@ -95,8 +67,8 @@
             border-radius: 0;
             box-shadow: none;
             border: none;
-            min-height: 100vh;
-            height: 100vh;
+            min-height: calc(100vh - 80px);
+            height: calc(100vh - 80px);
             overflow: hidden;
             position: fixed;
             top: 0;
@@ -335,16 +307,50 @@
             background: var(--primary-hover);
         }
 
-        /* 手機模式專屬切換按鈕區域 (預設隱藏，手機模式顯示) */
-        .mobile-mode-switch-bar {
-            display: none;
-            background: var(--primary-light);
-            padding: 12px 16px;
-            border-radius: 12px;
+        /* 最底部的全域模式切換列 (統一放在最下方) */
+        .global-bottom-switcher {
+            display: flex;
+            gap: 12px;
+            background: #ffffff;
+            padding: 10px 20px;
+            border-radius: 30px;
+            box-shadow: var(--shadow);
             border: 1px solid var(--border-color);
-            margin-bottom: 20px;
-            justify-content: space-between;
             align-items: center;
+            justify-content: center;
+            width: fit-content;
+            margin: 0 auto;
+        }
+
+        /* 手機模式專屬的底部固定切換列 */
+        .app-container.mobile-mode ~ .global-bottom-switcher {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            border-radius: 0;
+            border-top: 1px solid var(--border-color);
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+            z-index: 1001;
+            padding: 12px 16px;
+            background: #ffffff;
+        }
+
+        .mode-btn {
+            background: transparent;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 700;
+            color: var(--text-sub);
+            transition: all 0.3s ease;
+        }
+
+        .mode-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
         }
 
         /* 切換手機模式時的排版調整 */
@@ -360,27 +366,15 @@
             flex-direction: column;
         }
 
-        .app-container.mobile-mode .mobile-mode-switch-bar {
-            display: flex !important;
-        }
-
         @media (max-width: 768px) {
-            .mode-switcher {
-                display: none; /* 隱藏原本上方會跑版的切換按鈕 */
-            }
             body {
                 padding: 0;
+                padding-bottom: 60px; /* 預留底部切換列空間 */
             }
         }
     </style>
 </head>
 <body>
-
-    <!-- 頂部模式切換器 (Web寬螢幕使用) -->
-    <div class="mode-switcher">
-        <button class="mode-btn active" onclick="switchMode('web')">💻 Web 寬螢幕模式</button>
-        <button class="mode-btn" onclick="switchMode('mobile')">📱 手機滿版模式</button>
-    </div>
 
     <!-- 主應用程式容器 -->
     <div id="appContainer" class="app-container web-mode">
@@ -418,16 +412,6 @@
                 
                 <!-- 1. 總覽儀表板 -->
                 <div id="page-dashboard" class="page-pane active">
-                    
-                    <!-- 手機模式專屬的切換按鈕橫幅 -->
-                    <div class="mobile-mode-switch-bar">
-                        <div>
-                            <div style="font-weight: 700; font-size: 0.9rem; color: var(--primary);">目前為手機滿版模式</div>
-                            <div style="font-size: 0.75rem; color: var(--text-sub);">想要看電腦寬螢幕版嗎？</div>
-                        </div>
-                        <button class="btn-primary" style="padding: 6px 14px; font-size: 0.85rem;" onclick="switchMode('web')">切換 Web 版</button>
-                    </div>
-
                     <div class="header-title">哈囉，收藏家！👋</div>
                     <div class="header-subtitle">今天是個適合抽卡、整理周邊的好日子。</div>
 
@@ -547,6 +531,13 @@
         </div>
     </div>
 
+    <!-- 統一放在最下方的模式切換列 -->
+    <div class="global-bottom-switcher">
+        <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-sub);">顯示模式：</span>
+        <button class="mode-btn active" onclick="switchMode('web')">💻 Web 寬螢幕</button>
+        <button class="mode-btn" onclick="switchMode('mobile')">📱 手機滿版</button>
+    </div>
+
     <script>
         /* ==========================================
             1. 填入你的 Supabase 專案資訊
@@ -655,7 +646,7 @@
             const titleInput = prompt("請輸入收藏名稱 (例如：五條悟壓克力立牌)：", "Frieren 芙莉蓮模型");
             if (!titleInput) return;
 
-            const categoryInput = prompt("分類請輸入 card (卡片) or goods (周邊)：", "card");
+            const categoryInput = prompt("分類請輸入 card (卡片) 或 goods (周邊)：", "card");
             const tagInput = prompt("請輸入標籤 (例如：SSR 閃卡 / 盲盒公仔)：", "UR 稀有卡");
             const priceInput = prompt("請輸入購入金額 (數字)：", "990");
 
@@ -684,7 +675,7 @@
             ========================================== */
         function switchMode(mode) {
             const container = document.getElementById('appContainer');
-            const btns = document.querySelectorAll('.mode-btn');
+            const btns = document.querySelectorAll('.global-bottom-switcher .mode-btn');
             
             btns.forEach(btn => btn.classList.remove('active'));
             
