@@ -103,7 +103,7 @@
         }
 
         /* 手機模式頂部瀏海/靈動島裝飾 */
-        .mobile-mode::before {
+        .app-container.mobile-mode::before {
             content: '';
             position: absolute;
             top: 0;
@@ -347,21 +347,24 @@
         }
 
         /* 切換手機模式時的排版調整 */
-        .mobile-mode .sidebar {
+        .app-container.mobile-mode .sidebar {
             display: none !important;
         }
 
-        .mobile-mode .mobile-tabbar {
+        .app-container.mobile-mode .mobile-tabbar {
             display: flex !important;
         }
 
-        .mobile-mode .app-layout {
+        .app-container.mobile-mode .app-layout {
             flex-direction: column;
         }
 
         @media (max-width: 768px) {
             .mode-switcher {
                 display: none;
+            }
+            body {
+                padding: 0;
             }
         }
     </style>
@@ -371,7 +374,7 @@
     <!-- 頂部模式切換器 -->
     <div class="mode-switcher">
         <button class="mode-btn" onclick="switchMode('web')">💻 Web 寬螢幕模式</button>
-        <button class="mode-btn active" onclick="switchMode('mobile')">📱 手機模擬模式</button>
+        <button class="mode-btn" onclick="switchMode('mobile')">📱 手機模擬模式</button>
     </div>
 
     <!-- 主應用程式容器 -->
@@ -531,22 +534,35 @@
 
     <script>
         /* ==========================================
-           1. 填入你的 Supabase 專案資訊
-           ========================================== */
+            1. 填入你的 Supabase 專案資訊
+            ========================================== */
         const SUPABASE_URL = 'https://wpxrncmhaiwkohegbxdv.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_AR7Pmd0Z3uXENSiyFCXHig_tRJQUgIB';
         
         // 初始化 Supabase
         const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // 頁面載入後抓取雲端資料
+        // 頁面載入後自動偵測裝置並抓取雲端資料
         window.addEventListener('DOMContentLoaded', () => {
+            autoDetectMode();
             fetchCollections();
         });
 
         /* ==========================================
-           2. 從 Supabase 讀取資料並渲染到畫面
-           ========================================== */
+            自動偵測螢幕大小切換模式
+            ========================================== */
+        function autoDetectMode() {
+            // 當螢幕寬度小於等於 768px（手機），自動切換為 mobile 模式，否則為 web 模式
+            if (window.innerWidth <= 768) {
+                switchMode('mobile');
+            } else {
+                switchMode('web');
+            }
+        }
+
+        /* ==========================================
+            2. 從 Supabase 讀取資料並渲染到畫面
+            ========================================== */
         async function fetchCollections() {
             try {
                 const { data, error } = await _supabase
@@ -565,8 +581,8 @@
         }
 
         /* ==========================================
-           3. 將資料動態塞入 HTML 畫面
-           ========================================== */
+            3. 將資料動態塞入 HTML 畫面
+            ========================================== */
         function renderData(items) {
             const cardsContainer = document.getElementById('cards-grid-container');
             const goodsContainer = document.getElementById('goods-grid-container');
@@ -619,8 +635,8 @@
         }
 
         /* ==========================================
-           4. 快速新增測試資料到 Supabase
-           ========================================== */
+            4. 快速新增測試資料到 Supabase
+            ========================================== */
         async function addNewItemPrompt() {
             const titleInput = prompt("請輸入收藏名稱 (例如：五條悟壓克力立牌)：", "Frieren 芙莉蓮模型");
             if (!titleInput) return;
@@ -650,8 +666,8 @@
         }
 
         /* ==========================================
-           5. 模式與分頁切換控制
-           ========================================== */
+            5. 模式與分頁切換控制
+            ========================================== */
         function switchMode(mode) {
             const container = document.getElementById('appContainer');
             const btns = document.querySelectorAll('.mode-btn');
@@ -660,10 +676,10 @@
             
             if (mode === 'web') {
                 container.className = 'app-container web-mode';
-                btns[0].classList.add('active');
+                if(btns[0]) btns[0].classList.add('active');
             } else {
                 container.className = 'app-container mobile-mode';
-                btns[1].classList.add('active');
+                if(btns[1]) btns[1].classList.add('active');
             }
         }
 
