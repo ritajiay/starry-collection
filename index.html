@@ -39,6 +39,35 @@
             padding: 20px;
         }
 
+        /* 頂部模式切換列 (僅在 Web 模式顯示) */
+        .mode-switcher {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            background: #ffffff;
+            padding: 8px 16px;
+            border-radius: 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .mode-btn {
+            background: transparent;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 700;
+            color: var(--text-sub);
+            transition: all 0.3s ease;
+        }
+
+        .mode-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
+        }
+
         /* 容器切換核心 */
         .app-container {
             width: 100%;
@@ -47,6 +76,7 @@
             transition: all 0.4s ease;
         }
 
+        /* Web 模式外框 */
         .app-container.web-mode {
             max-width: 1200px;
             background: var(--card-bg);
@@ -57,6 +87,7 @@
             overflow: hidden;
         }
 
+        /* 手機模式：滿版流暢 App 樣式 */
         .app-container.mobile-mode {
             max-width: 100%;
             width: 100%;
@@ -75,6 +106,7 @@
             z-index: 1000;
         }
 
+        /* 內部佈局 */
         .app-layout {
             display: flex;
             width: 100%;
@@ -83,7 +115,7 @@
             overflow: hidden;
         }
 
-        /* 側邊導覽列 */
+        /* 側邊導覽列 (Web模式用) */
         .sidebar {
             width: 260px;
             background: var(--primary-light);
@@ -97,22 +129,11 @@
             font-size: 1.2rem;
             font-weight: 700;
             color: var(--primary);
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             display: flex;
             align-items: center;
             gap: 10px;
             padding-left: 10px;
-        }
-
-        .user-status-box {
-            background: white;
-            padding: 10px 12px;
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
-            font-size: 0.8rem;
-            margin-bottom: 20px;
-            color: var(--text-sub);
-            word-break: break-all;
         }
 
         .nav-menu {
@@ -141,45 +162,6 @@
             box-shadow: 0 4px 12px rgba(74, 144, 226, 0.2);
         }
 
-        .sidebar-switcher {
-            margin-top: auto;
-            padding-top: 15px;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .sidebar-switch-btn, .logout-btn {
-            background: #ffffff;
-            border: 1px solid var(--border-color);
-            color: var(--primary);
-            padding: 10px 14px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 0.85rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            transition: all 0.2s;
-        }
-
-        .sidebar-switch-btn:hover, .logout-btn:hover {
-            background: var(--primary);
-            color: white;
-        }
-
-        .logout-btn {
-            color: #e74c3c;
-            border-color: #f5b7b1;
-        }
-        .logout-btn:hover {
-            background: #e74c3c;
-            color: white;
-        }
-
         /* 主內容區 */
         .main-content {
             flex: 1;
@@ -190,48 +172,12 @@
             position: relative;
         }
 
-        /* 登入畫面區塊 (未登入時顯示) */
-        .auth-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #ffffff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 500;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .auth-card {
-            background: var(--primary-light);
-            padding: 30px;
-            border-radius: var(--radius);
-            border: 1px solid var(--border-color);
-            width: 100%;
-            max-width: 400px;
-            box-shadow: var(--shadow);
-        }
-
-        .auth-input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 12px;
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
-            outline: none;
-        }
-
-        /* 手機模式底部導覽列 */
+        /* 手機模式專屬底部導覽列 */
         .mobile-tabbar {
             display: none;
             background: #ffffff;
             border-top: 1px solid var(--border-color);
-            padding: 10px 12px;
+            padding: 10px 16px;
             justify-content: space-around;
             align-items: center;
             box-shadow: 0 -4px 10px rgba(0,0,0,0.03);
@@ -243,7 +189,7 @@
             flex-direction: column;
             align-items: center;
             gap: 4px;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             color: var(--text-sub);
             cursor: pointer;
             font-weight: 600;
@@ -255,9 +201,10 @@
         }
 
         .mobile-tab-item span.icon {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
         }
 
+        /* 頁面內容通用樣式 */
         .page-pane {
             display: none;
             padding: 24px;
@@ -281,6 +228,7 @@
             margin-bottom: 24px;
         }
 
+        /* 統計小卡 */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -307,6 +255,7 @@
             color: var(--primary);
         }
 
+        /* 卡片網格與周邊列表 */
         .grid-cards {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -320,6 +269,12 @@
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,0.03);
             transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .collection-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 16px rgba(74, 144, 226, 0.15);
         }
 
         .card-img-placeholder {
@@ -360,6 +315,7 @@
             font-weight: 600;
         }
 
+        /* 動作按鈕 */
         .btn-primary {
             background: var(--primary);
             color: white;
@@ -372,8 +328,26 @@
             align-items: center;
             gap: 8px;
             box-shadow: 0 4px 10px rgba(74, 144, 226, 0.3);
+            transition: background 0.2s;
         }
 
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        /* 手機模式專屬切換按鈕區域 (預設隱藏，手機模式顯示) */
+        .mobile-mode-switch-bar {
+            display: none;
+            background: var(--primary-light);
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* 切換手機模式時的排版調整 */
         .app-container.mobile-mode .sidebar {
             display: none !important;
         }
@@ -386,12 +360,27 @@
             flex-direction: column;
         }
 
+        .app-container.mobile-mode .mobile-mode-switch-bar {
+            display: flex !important;
+        }
+
         @media (max-width: 768px) {
-            body { padding: 0; }
+            .mode-switcher {
+                display: none; /* 隱藏原本上方會跑版的切換按鈕 */
+            }
+            body {
+                padding: 0;
+            }
         }
     </style>
 </head>
 <body>
+
+    <!-- 頂部模式切換器 (Web寬螢幕使用) -->
+    <div class="mode-switcher">
+        <button class="mode-btn active" onclick="switchMode('web')">💻 Web 寬螢幕模式</button>
+        <button class="mode-btn" onclick="switchMode('mobile')">📱 手機滿版模式</button>
+    </div>
 
     <!-- 主應用程式容器 -->
     <div id="appContainer" class="app-container web-mode">
@@ -402,12 +391,6 @@
                 <div class="sidebar-brand">
                     <span>✨</span> 星空收藏手帳
                 </div>
-                
-                <!-- 會員身分資訊 -->
-                <div class="user-status-box" id="userStatusBox">
-                    載入會員中...
-                </div>
-
                 <ul class="nav-menu">
                     <li class="nav-item active" onclick="switchTab('dashboard', this)">
                         <span>📊</span> 總覽儀表板
@@ -425,33 +408,26 @@
                         <span>📅</span> 發售行事曆
                     </li>
                 </ul>
-
-                <div class="sidebar-switcher">
-                    <button class="sidebar-switch-btn" onclick="switchMode('mobile')">
-                        <span>📱</span> 切換手機滿版模式
-                    </button>
-                    <button class="logout-btn" onclick="handleLogout()">
-                        <span>🚪</span> 登出帳號
-                    </button>
+                <div style="font-size: 0.8rem; color: var(--text-sub); text-align: center; padding-top: 10px;">
+                    v2.0.0 Supabase Edition
                 </div>
             </div>
 
             <!-- 主內容區 -->
-            <div class="main-content" id="mainContentArea">
+            <div class="main-content">
                 
-                <!-- 會員登入畫面 (未登入時跳出) -->
-                <div id="authOverlay" class="auth-overlay">
-                    <div class="auth-card">
-                        <h2 style="color: var(--primary); margin-bottom: 10px;">🔐 會員權限登入</h2>
-                        <p style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 20px;">請輸入授權帳號密碼以解鎖您的收藏手帳</p>
-                        <input type="email" id="loginEmail" class="auth-input" placeholder="請輸入電子信箱">
-                        <input type="password" id="loginPassword" class="auth-input" placeholder="請輸入密碼">
-                        <button class="btn-primary" style="width: 100%; justify-content: center;" onclick="handleLogin()">登入系統</button>
-                    </div>
-                </div>
-
                 <!-- 1. 總覽儀表板 -->
                 <div id="page-dashboard" class="page-pane active">
+                    
+                    <!-- 手機模式專屬的切換按鈕橫幅 -->
+                    <div class="mobile-mode-switch-bar">
+                        <div>
+                            <div style="font-weight: 700; font-size: 0.9rem; color: var(--primary);">目前為手機滿版模式</div>
+                            <div style="font-size: 0.75rem; color: var(--text-sub);">想要看電腦寬螢幕版嗎？</div>
+                        </div>
+                        <button class="btn-primary" style="padding: 6px 14px; font-size: 0.85rem;" onclick="switchMode('web')">切換 Web 版</button>
+                    </div>
+
                     <div class="header-title">哈囉，收藏家！👋</div>
                     <div class="header-subtitle">今天是個適合抽卡、整理周邊的好日子。</div>
 
@@ -465,15 +441,15 @@
                             <div class="value" style="color: #e67e22;" id="stat-total-price">讀取中...</div>
                         </div>
                         <div class="stat-card">
-                            <h4>雲端安全狀態</h4>
-                            <div class="value" style="font-size: 1rem; color: #27ae60;">權限驗證通過 🛡️</div>
+                            <h4>雲端狀態</h4>
+                            <div class="value" style="font-size: 1rem; color: #27ae60;" id="stat-db-status">連線中...</div>
                         </div>
                     </div>
 
                     <div style="background: var(--primary-light); padding: 20px; border-radius: 14px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
                         <div>
                             <h3 style="color: var(--primary); margin-bottom: 6px;">快速記錄新收藏</h3>
-                            <p style="font-size: 0.85rem; color: var(--text-sub);">新增一筆受保護的會員專屬資料！</p>
+                            <p style="font-size: 0.85rem; color: var(--text-sub);">馬上點擊下方按鈕新增一筆測試資料到你的雲端資料庫！</p>
                         </div>
                         <button class="btn-primary" onclick="addNewItemPrompt()">＋ 新增測試</button>
                     </div>
@@ -484,12 +460,14 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                         <div>
                             <div class="header-title">🃏 動漫卡片圖鑑</div>
-                            <div class="header-subtitle">僅限會員檢視</div>
+                            <div class="header-subtitle">從 Supabase 雲端即時載入的卡片</div>
                         </div>
                         <button class="btn-primary" onclick="addNewItemPrompt()">＋ 新增品項</button>
                     </div>
+
+                    <!-- 動態載入卡片的容器 -->
                     <div class="grid-cards" id="cards-grid-container">
-                        <div style="color: var(--text-sub);">載入中...</div>
+                        <div style="color: var(--text-sub);">正在從雲端載入資料...</div>
                     </div>
                 </div>
 
@@ -502,8 +480,10 @@
                         </div>
                         <button class="btn-primary" onclick="addNewItemPrompt()">＋ 新增周邊</button>
                     </div>
+
+                    <!-- 動態載入周邊的容器 -->
                     <div class="grid-cards" id="goods-grid-container">
-                        <div style="color: var(--text-sub);">載入中...</div>
+                        <div style="color: var(--text-sub);">正在從雲端載入資料...</div>
                     </div>
                 </div>
 
@@ -512,7 +492,7 @@
                     <div class="header-title">💰 花費與預算記帳</div>
                     <div class="header-subtitle">掌握每個月的坑錢包進度</div>
                     <div style="background: var(--primary-light); padding: 20px; border-radius: 14px; border: 1px solid var(--border-color); margin-bottom: 20px;">
-                        <h3 style="color: var(--primary); margin-bottom: 10px;">會員記帳總覽</h3>
+                        <h3 style="color: var(--primary); margin-bottom: 10px;">雲端記帳總覽</h3>
                         <p style="font-size: 0.9rem; color: var(--text-sub); margin-bottom: 12px;" id="budget-desc">計算中...</p>
                         <div style="width: 100%; background: #ffffff; height: 12px; border-radius: 6px; overflow: hidden; border: 1px solid var(--border-color);">
                             <div id="budget-bar" style="width: 0%; background: var(--primary); height: 100%; border-radius: 6px; transition: width 0.5s;"></div>
@@ -524,12 +504,25 @@
                 <div id="page-calendar" class="page-pane">
                     <div class="header-title">📅 發售與預購行事曆</div>
                     <div class="header-subtitle">不錯過任何一檔預購與一番賞上市日</div>
+                    <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 14px; padding: 20px;">
+                        <ul style="list-style: none; display: flex; flex-direction: column; gap: 14px;">
+                            <li style="display: flex; gap: 16px; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                                <div style="background: var(--primary-light); color: var(--primary); padding: 8px 12px; border-radius: 8px; font-weight: 700; text-align: center; min-width: 60px;">
+                                    8/15
+                                </div>
+                                <div>
+                                    <div style="font-weight: 700;">排球少年一番賞 - 垃圾場的決戰</div>
+                                    <div style="font-size: 0.8rem; color: var(--text-sub);">各大便利商店與動漫專門店開抽</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
 
             </div>
         </div>
 
-        <!-- 手機模式底部導覽列 -->
+        <!-- 手機模式專屬底部導覽列 -->
         <div class="mobile-tabbar">
             <div class="mobile-tab-item active" onclick="switchTab('dashboard', this)">
                 <span class="icon">📊</span>
@@ -547,72 +540,43 @@
                 <span class="icon">💰</span>
                 <span>記帳</span>
             </div>
-            <div class="mobile-tab-item" onclick="switchMode('web')" style="color: var(--primary);">
-                <span class="icon">💻</span>
-                <span>Web版</span>
+            <div class="mobile-tab-item" onclick="switchTab('calendar', this)">
+                <span class="icon">📅</span>
+                <span>行事曆</span>
             </div>
         </div>
     </div>
 
     <script>
+        /* ==========================================
+            1. 填入你的 Supabase 專案資訊
+            ========================================== */
         const SUPABASE_URL = 'https://wpxrncmhaiwkohegbxdv.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_AR7Pmd0Z3uXENSiyFCXHig_tRJQUgIB';
         
+        // 初始化 Supabase
         const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // 頁面載入時檢查會員登入狀態
-        window.addEventListener('DOMContentLoaded', async () => {
+        // 頁面載入後自動偵測裝置並抓取雲端資料
+        window.addEventListener('DOMContentLoaded', () => {
             autoDetectMode();
-            checkUserSession();
+            fetchCollections();
         });
 
-        async function checkUserSession() {
-            const { data: { session } } = await _supabase.auth.getSession();
-            const overlay = document.getElementById('authOverlay');
-            const statusBox = document.getElementById('userStatusBox');
-
-            if (session) {
-                // 已登入
-                overlay.style.display = 'none';
-                statusBox.innerHTML = `👤 已登入<br><b style="color:var(--primary);">${session.user.email}</b>`;
-                fetchCollections();
+        /* ==========================================
+            自動偵測螢幕大小切換模式
+            ========================================== */
+        function autoDetectMode() {
+            if (window.innerWidth <= 768) {
+                switchMode('mobile');
             } else {
-                // 未登入
-                overlay.style.display = 'flex';
-                statusBox.innerHTML = `🔒 尚未登入會員`;
+                switchMode('web');
             }
         }
 
-        // 登入動作
-        async function handleLogin() {
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-
-            if (!email || !password) {
-                alert('請完整輸入帳號與密碼！');
-                return;
-            }
-
-            const { data, error } = await _supabase.auth.signInWithPassword({
-                email: email,
-                password: password
-            });
-
-            if (error) {
-                alert('登入失敗：' + error.message);
-            } else {
-                alert('登入成功！✨');
-                checkUserSession();
-            }
-        }
-
-        // 登出動作
-        async function handleLogout() {
-            await _supabase.auth.signOut();
-            alert('已安全登出');
-            checkUserSession();
-        }
-
+        /* ==========================================
+            2. 從 Supabase 讀取資料並渲染到畫面
+            ========================================== */
         async function fetchCollections() {
             try {
                 const { data, error } = await _supabase
@@ -621,12 +585,18 @@
                     .order('id', { ascending: false });
 
                 if (error) throw error;
+
+                document.getElementById('stat-db-status').innerText = '連線正常 ✨';
                 renderData(data);
             } catch (err) {
                 console.error('讀取失敗:', err);
+                document.getElementById('stat-db-status').innerText = '連線失敗 ⚠️';
             }
         }
 
+        /* ==========================================
+            3. 將資料動態塞入 HTML 畫面
+            ========================================== */
         function renderData(items) {
             const cardsContainer = document.getElementById('cards-grid-container');
             const goodsContainer = document.getElementById('goods-grid-container');
@@ -667,21 +637,26 @@
             cardsContainer.innerHTML = cardHtml || '<div style="color: var(--text-sub);">目前還沒有卡片收藏喔！</div>';
             goodsContainer.innerHTML = goodsHtml || '<div style="color: var(--text-sub);">目前還沒有周邊收藏喔！</div>';
 
+            // 更新儀表板統計
             document.getElementById('stat-total-count').innerText = `${totalCount} 件`;
             document.getElementById('stat-total-price').innerText = `NT$ ${totalPrice.toLocaleString()}`;
 
+            // 更新預算進度
             const budgetLimit = 6000;
             const percent = Math.min(Math.round((totalPrice / budgetLimit) * 100), 100);
             document.getElementById('budget-desc').innerText = `已花費 NT$ ${totalPrice.toLocaleString()} / 預算 NT$ ${budgetLimit.toLocaleString()} (${percent}%)`;
             document.getElementById('budget-bar').style.width = percent + '%';
         }
 
+        /* ==========================================
+            4. 快速新增測試資料到 Supabase
+            ========================================== */
         async function addNewItemPrompt() {
-            const titleInput = prompt("請輸入收藏名稱：", "Frieren 芙莉蓮模型");
+            const titleInput = prompt("請輸入收藏名稱 (例如：五條悟壓克力立牌)：", "Frieren 芙莉蓮模型");
             if (!titleInput) return;
 
-            const categoryInput = prompt("分類請輸入 card (卡片) 或 goods (周邊)：", "card");
-            const tagInput = prompt("請輸入標籤：", "UR 稀有卡");
+            const categoryInput = prompt("分類請輸入 card (卡片) or goods (周邊)：", "card");
+            const tagInput = prompt("請輸入標籤 (例如：SSR 閃卡 / 盲盒公仔)：", "UR 稀有卡");
             const priceInput = prompt("請輸入購入金額 (數字)：", "990");
 
             const { error } = await _supabase
@@ -699,42 +674,40 @@
             if (error) {
                 alert('新增失敗: ' + error.message);
             } else {
-                alert('成功新增到會員雲端！✨');
+                alert('成功新增到雲端！✨');
                 fetchCollections();
             }
         }
 
-        function autoDetectMode() {
-            if (window.innerWidth <= 768) {
-                switchMode('mobile');
-            } else {
-                switchMode('web');
-            }
-        }
-
+        /* ==========================================
+            5. 模式與分頁切換控制
+            ========================================== */
         function switchMode(mode) {
             const container = document.getElementById('appContainer');
+            const btns = document.querySelectorAll('.mode-btn');
+            
+            btns.forEach(btn => btn.classList.remove('active'));
+            
             if (mode === 'web') {
                 container.className = 'app-container web-mode';
+                if(btns[0]) btns[0].classList.add('active');
             } else {
                 container.className = 'app-container mobile-mode';
+                if(btns[1]) btns[1].classList.add('active');
             }
         }
 
         function switchTab(tabId, element) {
             const pages = document.querySelectorAll('.page-pane');
             pages.forEach(page => page.classList.remove('active'));
+            
             document.getElementById('page-' + tabId).classList.add('active');
 
             const navItems = document.querySelectorAll('.sidebar .nav-item');
             navItems.forEach(item => item.classList.remove('active'));
             
             const mobileTabs = document.querySelectorAll('.mobile-tabbar .mobile-tab-item');
-            mobileTabs.forEach(item => {
-                if(!item.getAttribute('onclick').includes("switchMode")) {
-                    item.classList.remove('active');
-                }
-            });
+            mobileTabs.forEach(item => item.classList.remove('active'));
 
             if (element.classList.contains('nav-item')) {
                 element.classList.add('active');
@@ -742,7 +715,7 @@
                 if (index !== -1 && mobileTabs[index]) {
                     mobileTabs[index].classList.add('active');
                 }
-            } else if (element.classList.contains('mobile-tab-item') && !element.getAttribute('onclick').includes("switchMode")) {
+            } else if (element.classList.contains('mobile-tab-item')) {
                 element.classList.add('active');
                 const index = Array.from(mobileTabs).indexOf(element);
                 if (index !== -1 && navItems[index]) {
