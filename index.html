@@ -87,34 +87,23 @@
             overflow: hidden;
         }
 
-        /* 手機模式外框 (模擬手機外殼) */
+        /* 手機模式：改為真正的滿版流暢 App 樣式，無外殼黑框 */
         .app-container.mobile-mode {
-            max-width: 410px;
+            max-width: 100%;
+            width: 100%;
             background: #ffffff;
-            border-radius: 40px;
-            box-shadow: 0 15px 35px rgba(74, 144, 226, 0.15);
-            border: 10px solid #2c3e50;
-            min-height: 800px;
-            max-height: 850px;
+            border-radius: 0;
+            box-shadow: none;
+            border: none;
+            min-height: 100vh;
+            height: 100vh;
             overflow: hidden;
-            position: relative;
+            position: fixed;
+            top: 0;
+            left: 0;
             display: flex;
             flex-direction: column;
-        }
-
-        /* 手機模式頂部瀏海/靈動島裝飾 */
-        .app-container.mobile-mode::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 150px;
-            height: 20px;
-            background: #2c3e50;
-            border-bottom-left-radius: 12px;
-            border-bottom-right-radius: 12px;
-            z-index: 100;
+            z-index: 1000;
         }
 
         /* 內部佈局 */
@@ -374,7 +363,7 @@
     <!-- 頂部模式切換器 -->
     <div class="mode-switcher">
         <button class="mode-btn" onclick="switchMode('web')">💻 Web 寬螢幕模式</button>
-        <button class="mode-btn" onclick="switchMode('mobile')">📱 手機模擬模式</button>
+        <button class="mode-btn" onclick="switchMode('mobile')">📱 手機滿版模式</button>
     </div>
 
     <!-- 主應用程式容器 -->
@@ -552,7 +541,6 @@
             自動偵測螢幕大小切換模式
             ========================================== */
         function autoDetectMode() {
-            // 當螢幕寬度小於等於 768px（手機），自動切換為 mobile 模式，否則為 web 模式
             if (window.innerWidth <= 768) {
                 switchMode('mobile');
             } else {
