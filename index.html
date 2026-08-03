@@ -39,7 +39,7 @@
             padding: 20px;
         }
 
-        /* 登入遮罩畫面 (第二步：身份驗證防護) */
+        /* 登入遮罩畫面 */
         #authOverlay {
             position: fixed;
             top: 0;
@@ -292,13 +292,21 @@
             box-shadow: 0 6px 16px rgba(74, 144, 226, 0.15);
         }
 
-        .card-img-placeholder {
+        /* 💡【修改處 1】：卡片圖片容器，支援真實圖片渲染或 Emoji 佔位 */
+        .card-img-container {
             height: 140px;
             background: linear-gradient(135deg, #e3f0fc, #cfe2f3);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 2.5rem;
+            overflow: hidden;
+        }
+
+        .card-img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .card-info {
@@ -364,7 +372,6 @@
         .app-container.mobile-mode .mobile-tabbar { display: flex !important; }
         .app-container.mobile-mode .app-layout { flex-direction: column; }
 
-        /* 放在 Web 側邊欄最下方的切換按鈕 */
         .sidebar-switcher {
             margin-top: auto;
             padding-top: 15px;
@@ -396,11 +403,27 @@
             color: white;
         }
 
+        /* 💡【新增處 2】：美觀的新增品項 Modal 樣式（用來讓使用者上傳圖片） */
+        #uploadModal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none; align-items: center; justify-content: center;
+            z-index: 10000;
+        }
+        .modal-card {
+            background: white; padding: 30px; border-radius: var(--radius);
+            width: 90%; max-width: 420px; box-shadow: var(--shadow);
+        }
+        .modal-card h3 { color: var(--primary); margin-bottom: 16px; }
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 6px; color: var(--text-main); }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; outline: none; }
     </style>
 </head>
 <body>
 
-    <!-- 🔒 身份驗證遮罩層 (未登入時強制阻擋) -->
+    <!-- 🔒 身份驗證遮罩層 -->
     <div id="authOverlay">
         <div class="auth-card">
             <h2>✨ 收藏手帳</h2>
@@ -412,11 +435,45 @@
         </div>
     </div>
 
+    <!-- 💡【新增處 3】：帶有檔案上傳欄位的新增表單 Modal -->
+    <div id="uploadModal">
+        <div class="modal-card">
+            <h3>✨ 新增收藏品與照片</h3>
+            <div class="form-group">
+                <label>收藏名稱</label>
+                <input type="text" id="inputTitle" placeholder="例如：五條悟壓克力立牌">
+            </div>
+            <div class="form-group">
+                <label>分類</label>
+                <select id="inputCategory">
+                    <option value="card">🃏 動漫卡片</option>
+                    <option value="goods">🎁 盲包周邊</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>標籤</label>
+                <input type="text" id="inputTag" placeholder="例如：UR稀有卡 / 盲盒公仔">
+            </div>
+            <div class="form-group">
+                <label>購入金額 (NT$)</label>
+                <input type="number" id="inputPrice" placeholder="990">
+            </div>
+            <div class="form-group">
+                <label>上傳收藏照片</label>
+                <input type="file" id="inputFile" accept="image/*">
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn-primary" onclick="submitNewItem()">確認上傳並儲存</button>
+                <button class="btn-primary" style="background: #95a5a6;" onclick="closeModal()">取消</button>
+            </div>
+        </div>
+    </div>
+
     <!-- 主應用程式容器 -->
     <div id="appContainer" class="app-container web-mode">
         <div class="app-layout">
             
-            <!-- 側邊欄 (Web模式使用) -->
+            <!-- 側邊欄 -->
             <div class="sidebar">
                 <div class="sidebar-brand">
                     <span>✨</span> 收藏手帳
@@ -437,7 +494,6 @@
                     <li class="nav-item" onclick="switchTab('calendar', this)">
                         <span>📅</span> 發售行事曆
                     </li>
-                    <!-- Web 版放在左側導覽列最下方的切換按鈕 -->
                     <div class="sidebar-switcher">
                         <button class="sidebar-switch-btn" onclick="switchMode('mobile')">
                             <span>📱</span> 切換手機滿版模式
@@ -452,7 +508,6 @@
                 
                 <!-- 1. 總覽儀表板 -->
                 <div id="page-dashboard" class="page-pane active">
-
                     <div class="header-title">哈囉，收藏家！👋</div>
                     <div class="header-subtitle">今天是個適合抽卡、整理周邊的好日子。</div>
 
@@ -474,9 +529,10 @@
                     <div style="background: var(--primary-light); padding: 20px; border-radius: 14px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
                         <div>
                             <h3 style="color: var(--primary); margin-bottom: 6px;">快速記錄新收藏</h3>
-                            <p style="font-size: 0.85rem; color: var(--text-sub);">馬上點擊下方按鈕新增一筆測試資料到你的雲端資料庫！</p>
+                            <p style="font-size: 0.85rem; color: var(--text-sub);">馬上點擊下方按鈕上傳照片並新增一筆資料！</p>
                         </div>
-                        <button class="btn-primary" style="width: auto;" onclick="addNewItemPrompt()">＋ 新增測試</button>
+                        <!-- 💡【修改處 4】：改為呼叫開啟 Modal 的函式 -->
+                        <button class="btn-primary" style="width: auto;" onclick="openModal()">＋ 新增收藏</button>
                     </div>
                 </div>
 
@@ -487,7 +543,7 @@
                             <div class="header-title">🃏 動漫卡片圖鑑</div>
                             <div class="header-subtitle">從 Supabase 雲端即時載入的卡片</div>
                         </div>
-                        <button class="btn-primary" style="width: auto;" onclick="addNewItemPrompt()">＋ 新增品項</button>
+                        <button class="btn-primary" style="width: auto;" onclick="openModal()">＋ 新增品項</button>
                     </div>
                     <div class="grid-cards" id="cards-grid-container">
                         <div style="color: var(--text-sub);">正在從雲端載入資料...</div>
@@ -501,7 +557,7 @@
                             <div class="header-title">🎁 盲包周邊收藏</div>
                             <div class="header-subtitle">壓克力排、徽章與盲盒紀錄</div>
                         </div>
-                        <button class="btn-primary" style="width: auto;" onclick="addNewItemPrompt()">＋ 新增周邊</button>
+                        <button class="btn-primary" style="width: auto;" onclick="openModal()">＋ 新增周邊</button>
                     </div>
                     <div class="grid-cards" id="goods-grid-container">
                         <div style="color: var(--text-sub);">正在從雲端載入資料...</div>
@@ -565,7 +621,6 @@
                 <span class="icon">📅</span>
                 <span>行事曆</span>
             </div>
-            <!-- 手機版專屬切換按鈕放在底部導覽列最右側 -->
             <div class="mobile-tab-item" onclick="switchMode('web')" style="color: var(--primary);">
                 <span class="icon">💻</span>
                 <span>Web版</span>
@@ -583,26 +638,21 @@
         
         const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // 頁面載入時檢查登入狀態
         window.addEventListener('DOMContentLoaded', async () => {
             autoDetectMode();
             checkUserSession();
         });
 
-        // 檢查是否有現存的登入 Session
         async function checkUserSession() {
             const { data: { session } } = await _supabase.auth.getSession();
             if (session) {
-                // 已登入：隱藏登入遮罩，載入資料
                 document.getElementById('authOverlay').style.display = 'none';
                 fetchCollections();
             } else {
-                // 未登入：保持登入遮罩顯示
                 document.getElementById('authOverlay').style.display = 'flex';
             }
         }
 
-        // 執行登入動作
         async function handleLogin() {
             const email = document.getElementById('emailInput').value.trim();
             const password = document.getElementById('passwordInput').value.trim();
@@ -629,10 +679,9 @@
             }
         }
 
-        // 執行登出動作
         async function handleLogout() {
             await _supabase.auth.signOut();
-            location.reload(); // 重新整理並回到登入畫面
+            location.reload();
         }
 
         function autoDetectMode() {
@@ -674,14 +723,18 @@
 
             items.forEach(item => {
                 totalPrice += Number(item.price || 0);
-                const emoji = item.image_emoji || '✨';
                 const tag = item.tag || '收藏品';
                 const title = item.title || '無標題';
                 const price = item.price ? `NT$ ${Number(item.price).toLocaleString()}` : '未定';
 
+                /* 💡【修改處 5】：渲染卡片時，如果有 image_url 則顯示真實圖片，沒有則用預設 Emoji 佔位 */
+                const imageContent = item.image_url 
+                    ? `<img src="${item.image_url}" alt="${title}">` 
+                    : (item.image_emoji || '✨');
+
                 const cardTemplate = `
                     <div class="collection-card">
-                        <div class="card-img-placeholder">${emoji}</div>
+                        <div class="card-img-container">${imageContent}</div>
                         <div class="card-info">
                             <span class="card-tag">${tag}</span>
                             <div class="card-title">${title}</div>
@@ -709,30 +762,78 @@
             document.getElementById('budget-bar').style.width = percent + '%';
         }
 
-        async function addNewItemPrompt() {
-            const titleInput = prompt("請輸入收藏名稱 (例如：五條悟壓克力立牌)：", "Frieren 芙莉蓮模型");
-            if (!titleInput) return;
+        /* 💡【新增處 6】：Modal 互動開關控制 */
+        function openModal() {
+            document.getElementById('uploadModal').style.display = 'flex';
+        }
+        function closeModal() {
+            document.getElementById('uploadModal').style.display = 'none';
+        }
 
-            const categoryInput = prompt("分類請輸入 card (卡片) or goods (周邊)：", "card");
-            const tagInput = prompt("請輸入標籤 (例如：SSR 閃卡 / 盲盒公仔)：", "UR 稀有卡");
-            const priceInput = prompt("請輸入購入金額 (數字)：", "990");
+        /* 💡【修改處 7】：核心修改：將舊的 prompt 換成上傳檔案並存進 Supabase Storage 與資料庫 */
+        async function submitNewItem() {
+            const titleInput = document.getElementById('inputTitle').value.trim();
+            const categoryInput = document.getElementById('inputCategory').value;
+            const tagInput = document.getElementById('inputTag').value.trim();
+            const priceInput = document.getElementById('inputPrice').value;
+            const fileInput = document.getElementById('inputFile');
+            const file = fileInput.files[0];
 
+            if (!titleInput) {
+                alert('請輸入收藏名稱！');
+                return;
+            }
+
+            let imageUrl = null;
+
+            // 如果使用者有選擇圖片，先執行 Storage 上傳
+            if (file) {
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
+                const filePath = `uploads/${fileName}`;
+
+                // 上傳到 Supabase Storage (請確保在後台建立名為 collection-images 的 bucket)
+                const { data: uploadData, error: uploadError } = await _supabase.storage
+                    .from('collection-images')
+                    .upload(filePath, file);
+
+                if (uploadError) {
+                    alert('圖片上傳失敗: ' + uploadError.message);
+                    return;
+                }
+
+                // 取得公開網址
+                const { data: publicUrlData } = _supabase.storage
+                    .from('collection-images')
+                    .getPublicUrl(filePath);
+
+                imageUrl = publicUrlData.publicUrl;
+            }
+
+            // 將資料寫入 collections 資料表 (包含 image_url)
             const { error } = await _supabase
                 .from('collections')
                 .insert([
                     { 
                         title: titleInput, 
-                        category: categoryInput === 'goods' ? 'goods' : 'card', 
-                        tag: tagInput, 
+                        category: categoryInput, 
+                        tag: tagInput || '收藏品', 
                         price: Number(priceInput) || 0, 
+                        image_url: imageUrl,
                         image_emoji: categoryInput === 'goods' ? '🧸' : '🌟' 
                     }
                 ]);
 
             if (error) {
-                alert('新增失敗: ' + error.message);
+                alert('資料新增失敗: ' + error.message);
             } else {
-                alert('成功新增到雲端！✨');
+                alert('成功新增品項與照片到雲端！✨');
+                closeModal();
+                // 清空表單
+                document.getElementById('inputTitle').value = '';
+                document.getElementById('inputTag').value = '';
+                document.getElementById('inputPrice').value = '';
+                fileInput.value = '';
                 fetchCollections();
             }
         }
