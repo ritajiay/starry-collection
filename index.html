@@ -92,18 +92,6 @@
             border-color: var(--primary);
         }
 
-        /* 頂部模式切換列 (僅在 Web 模式顯示) */
-        .mode-switcher {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
-            background: #ffffff;
-            padding: 8px 16px;
-            border-radius: 30px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border-color);
-        }
-
         /* 容器切換核心 */
         .app-container {
             width: 100%;
@@ -408,11 +396,6 @@
             color: white;
         }
 
-
-        @media (max-width: 768px) {
-            .mode-switcher { display: none; }
-            body { padding: 0; }
-        }
     </style>
 </head>
 <body>
@@ -586,6 +569,10 @@
             <div class="mobile-tab-item" onclick="switchMode('web')" style="color: var(--primary);">
                 <span class="icon">💻</span>
                 <span>Web版</span>
+            </div>
+            <div class="mobile-tab-item" onclick="handleLogout()">
+                <span class="icon">↩</span>
+                <span>登出</span>
             </div>
         </div>
     </div>
