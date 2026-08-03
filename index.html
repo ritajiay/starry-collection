@@ -39,6 +39,35 @@
             padding: 20px;
         }
 
+        /* 頂部模式切換列 (僅在 Web 模式顯示) */
+        .mode-switcher {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            background: #ffffff;
+            padding: 8px 16px;
+            border-radius: 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .mode-btn {
+            background: transparent;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 700;
+            color: var(--text-sub);
+            transition: all 0.3s ease;
+        }
+
+        .mode-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
+        }
+
         /* 容器切換核心 */
         .app-container {
             width: 100%;
@@ -133,38 +162,6 @@
             box-shadow: 0 4px 12px rgba(74, 144, 226, 0.2);
         }
 
-        /* 放在 Web 側邊欄最下方的切換按鈕 */
-        .sidebar-switcher {
-            margin-top: auto;
-            padding-top: 15px;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .sidebar-switch-btn {
-            background: #ffffff;
-            border: 1px solid var(--border-color);
-            color: var(--primary);
-            padding: 10px 14px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 0.85rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            transition: all 0.2s;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-        }
-
-        .sidebar-switch-btn:hover {
-            background: var(--primary);
-            color: white;
-        }
-
         /* 主內容區 */
         .main-content {
             flex: 1;
@@ -180,7 +177,7 @@
             display: none;
             background: #ffffff;
             border-top: 1px solid var(--border-color);
-            padding: 10px 12px;
+            padding: 10px 16px;
             justify-content: space-around;
             align-items: center;
             box-shadow: 0 -4px 10px rgba(0,0,0,0.03);
@@ -192,7 +189,7 @@
             flex-direction: column;
             align-items: center;
             gap: 4px;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             color: var(--text-sub);
             cursor: pointer;
             font-weight: 600;
@@ -204,7 +201,7 @@
         }
 
         .mobile-tab-item span.icon {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
         }
 
         /* 頁面內容通用樣式 */
@@ -338,6 +335,18 @@
             background: var(--primary-hover);
         }
 
+        /* 手機模式專屬切換按鈕區域 (預設隱藏，手機模式顯示) */
+        .mobile-mode-switch-bar {
+            display: none;
+            background: var(--primary-light);
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+            justify-content: space-between;
+            align-items: center;
+        }
+
         /* 切換手機模式時的排版調整 */
         .app-container.mobile-mode .sidebar {
             display: none !important;
@@ -351,7 +360,14 @@
             flex-direction: column;
         }
 
+        .app-container.mobile-mode .mobile-mode-switch-bar {
+            display: flex !important;
+        }
+
         @media (max-width: 768px) {
+            .mode-switcher {
+                display: none; /* 隱藏原本上方會跑版的切換按鈕 */
+            }
             body {
                 padding: 0;
             }
@@ -359,6 +375,12 @@
     </style>
 </head>
 <body>
+
+    <!-- 頂部模式切換器 (Web寬螢幕使用) -->
+    <div class="mode-switcher">
+        <button class="mode-btn active" onclick="switchMode('web')">💻 Web 寬螢幕模式</button>
+        <button class="mode-btn" onclick="switchMode('mobile')">📱 手機滿版模式</button>
+    </div>
 
     <!-- 主應用程式容器 -->
     <div id="appContainer" class="app-container web-mode">
@@ -386,12 +408,8 @@
                         <span>📅</span> 發售行事曆
                     </li>
                 </ul>
-
-                <!-- Web 版放在左側導覽列最下方的切換按鈕 -->
-                <div class="sidebar-switcher">
-                    <button class="sidebar-switch-btn" onclick="switchMode('mobile')">
-                        <span>📱</span> 切換手機滿版模式
-                    </button>
+                <div style="font-size: 0.8rem; color: var(--text-sub); text-align: center; padding-top: 10px;">
+                    v2.0.0 Supabase Edition
                 </div>
             </div>
 
@@ -400,6 +418,16 @@
                 
                 <!-- 1. 總覽儀表板 -->
                 <div id="page-dashboard" class="page-pane active">
+                    
+                    <!-- 手機模式專屬的切換按鈕橫幅 -->
+                    <div class="mobile-mode-switch-bar">
+                        <div>
+                            <div style="font-weight: 700; font-size: 0.9rem; color: var(--primary);">目前為手機滿版模式</div>
+                            <div style="font-size: 0.75rem; color: var(--text-sub);">想要看電腦寬螢幕版嗎？</div>
+                        </div>
+                        <button class="btn-primary" style="padding: 6px 14px; font-size: 0.85rem;" onclick="switchMode('web')">切換 Web 版</button>
+                    </div>
+
                     <div class="header-title">哈囉，收藏家！👋</div>
                     <div class="header-subtitle">今天是個適合抽卡、整理周邊的好日子。</div>
 
@@ -494,7 +522,7 @@
             </div>
         </div>
 
-        <!-- 手機模式專屬底部導覽列（包含切換回 Web 版的按鈕） -->
+        <!-- 手機模式專屬底部導覽列 -->
         <div class="mobile-tabbar">
             <div class="mobile-tab-item active" onclick="switchTab('dashboard', this)">
                 <span class="icon">📊</span>
@@ -515,11 +543,6 @@
             <div class="mobile-tab-item" onclick="switchTab('calendar', this)">
                 <span class="icon">📅</span>
                 <span>行事曆</span>
-            </div>
-            <!-- 手機版專屬切換按鈕放在底部導覽列最右側 -->
-            <div class="mobile-tab-item" onclick="switchMode('web')" style="color: var(--primary);">
-                <span class="icon">💻</span>
-                <span>Web版</span>
             </div>
         </div>
     </div>
@@ -632,7 +655,7 @@
             const titleInput = prompt("請輸入收藏名稱 (例如：五條悟壓克力立牌)：", "Frieren 芙莉蓮模型");
             if (!titleInput) return;
 
-            const categoryInput = prompt("分類請輸入 card (卡片) 或 goods (周邊)：", "card");
+            const categoryInput = prompt("分類請輸入 card (卡片) or goods (周邊)：", "card");
             const tagInput = prompt("請輸入標籤 (例如：SSR 閃卡 / 盲盒公仔)：", "UR 稀有卡");
             const priceInput = prompt("請輸入購入金額 (數字)：", "990");
 
@@ -661,11 +684,16 @@
             ========================================== */
         function switchMode(mode) {
             const container = document.getElementById('appContainer');
+            const btns = document.querySelectorAll('.mode-btn');
+            
+            btns.forEach(btn => btn.classList.remove('active'));
             
             if (mode === 'web') {
                 container.className = 'app-container web-mode';
+                if(btns[0]) btns[0].classList.add('active');
             } else {
                 container.className = 'app-container mobile-mode';
+                if(btns[1]) btns[1].classList.add('active');
             }
         }
 
@@ -679,11 +707,7 @@
             navItems.forEach(item => item.classList.remove('active'));
             
             const mobileTabs = document.querySelectorAll('.mobile-tabbar .mobile-tab-item');
-            mobileTabs.forEach(item => {
-                if(!item.getAttribute('onclick').includes("switchMode")) {
-                    item.classList.remove('active');
-                }
-            });
+            mobileTabs.forEach(item => item.classList.remove('active'));
 
             if (element.classList.contains('nav-item')) {
                 element.classList.add('active');
@@ -691,7 +715,7 @@
                 if (index !== -1 && mobileTabs[index]) {
                     mobileTabs[index].classList.add('active');
                 }
-            } else if (element.classList.contains('mobile-tab-item') && !element.getAttribute('onclick').includes("switchMode")) {
+            } else if (element.classList.contains('mobile-tab-item')) {
                 element.classList.add('active');
                 const index = Array.from(mobileTabs).indexOf(element);
                 if (index !== -1 && navItems[index]) {
