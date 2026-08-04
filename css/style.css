@@ -334,6 +334,12 @@ body {
     font-weight: 600;
 }
 
+.card-notes {
+    font-size: 0.85rem;
+    color: var(--text-sub);
+    font-weight: 600;
+}
+
 .btn-primary {
     background: var(--primary);
     color: white;

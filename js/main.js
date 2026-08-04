@@ -92,6 +92,7 @@ function renderData(items) {
         const title = item.title || '無標題';
         const date = item.date || '2026-12-21';
         const price = item.price ? `NT$ ${Number(item.price).toLocaleString()}` : '未定';
+        const notes = item.notes || '';
 
         /* 渲染卡片時，如果有 image_url 則顯示真實圖片，沒有則用預設 Emoji 佔位 */
         const imageContent = item.image_url 
@@ -106,6 +107,7 @@ function renderData(items) {
                     <div class="card-title">${title}</div>
                     <div class="card-date">購入日期: ${date}</div>
                     <div class="card-price">購入: ${price}</div>
+                    <div class="card-notes">備註: ${notes}</div>
                 </div>
             </div>
         `;
@@ -144,6 +146,7 @@ async function submitNewItem() {
     const tagInput = document.getElementById('inputTag').value.trim();
     const dateInput = document.getElementById('inputDate').value;
     const priceInput = document.getElementById('inputPrice').value;
+    const notesInput = document.getElementById('inputNotes').value.trim();
     const fileInput = document.getElementById('inputFile');
     const file = fileInput.files[0];
 
@@ -189,7 +192,8 @@ async function submitNewItem() {
                 date: dateInput || '2026-12-21',
                 price: Number(priceInput) || 0, 
                 image_url: imageUrl,
-                image_emoji: categoryInput === 'goods' ? '🧸' : '🌟' 
+                image_emoji: categoryInput === 'goods' ? '🧸' : '🌟' ,
+                notes: notesInput || ''
             }
         ]);
 
@@ -203,6 +207,7 @@ async function submitNewItem() {
         document.getElementById('inputTag').value = '';
         document.getElementById('inputDate').value = '';
         document.getElementById('inputPrice').value = '';
+        document.getElementById('inputNotes').value = '';
         fileInput.value = '';
         fetchCollections();
     }
