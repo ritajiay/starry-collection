@@ -322,6 +322,12 @@ body {
     margin-bottom: 6px;
 }
 
+.card-date {
+    font-size: 0.85rem;
+    color: var(--text-sub);
+    font-weight: 600;
+}
+
 .card-price {
     font-size: 0.85rem;
     color: var(--text-sub);

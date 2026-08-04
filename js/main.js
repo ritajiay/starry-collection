@@ -90,6 +90,7 @@ function renderData(items) {
         totalPrice += Number(item.price || 0);
         const tag = item.tag || '收藏品';
         const title = item.title || '無標題';
+        const date = item.date || '2026-12-21';
         const price = item.price ? `NT$ ${Number(item.price).toLocaleString()}` : '未定';
 
         /* 渲染卡片時，如果有 image_url 則顯示真實圖片，沒有則用預設 Emoji 佔位 */
@@ -103,6 +104,7 @@ function renderData(items) {
                 <div class="card-info">
                     <span class="card-tag">${tag}</span>
                     <div class="card-title">${title}</div>
+                    <div class="card-date">購入日期: ${date}</div>
                     <div class="card-price">購入: ${price}</div>
                 </div>
             </div>
@@ -140,6 +142,7 @@ async function submitNewItem() {
     const titleInput = document.getElementById('inputTitle').value.trim();
     const categoryInput = document.getElementById('inputCategory').value;
     const tagInput = document.getElementById('inputTag').value.trim();
+    const dateInput = document.getElementById('inputDate').value;
     const priceInput = document.getElementById('inputPrice').value;
     const fileInput = document.getElementById('inputFile');
     const file = fileInput.files[0];
@@ -183,6 +186,7 @@ async function submitNewItem() {
                 title: titleInput, 
                 category: categoryInput, 
                 tag: tagInput || '收藏品', 
+                date: dateInput || '2026-12-21',
                 price: Number(priceInput) || 0, 
                 image_url: imageUrl,
                 image_emoji: categoryInput === 'goods' ? '🧸' : '🌟' 
@@ -197,6 +201,7 @@ async function submitNewItem() {
         // 清空表單
         document.getElementById('inputTitle').value = '';
         document.getElementById('inputTag').value = '';
+        document.getElementById('inputDate').value = '';
         document.getElementById('inputPrice').value = '';
         fileInput.value = '';
         fetchCollections();
