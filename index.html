@@ -71,9 +71,11 @@
             
             <!-- 側邊欄 -->
             <div class="sidebar">
+                <button class="sidebar-toggle-btn" onclick="toggleSidebar()" aria-label="收合側邊欄">⟨</button>
+
                 <div class="sidebar-brand">
                     <span class="brand-badge">✨</span>
-                    <div>
+                    <div class="brand-info">
                         <div class="brand-name">收藏手帳</div>
                         <div class="brand-sub">Starry Collection</div>
                     </div>
@@ -86,19 +88,24 @@
 
                 <ul class="nav-menu">
                     <li class="nav-item active" onclick="switchTab('dashboard', this)">
-                        <span>📊</span> 總覽儀表板
+                        <span class="nav-icon">📊</span>
+                        <span class="nav-label">總覽儀表板</span>
                     </li>
                     <li class="nav-item" onclick="switchTab('cards', this)">
-                        <span>🃏</span> 動漫卡片圖鑑
+                        <span class="nav-icon">🃏</span>
+                        <span class="nav-label">動漫卡片圖鑑</span>
                     </li>
                     <li class="nav-item" onclick="switchTab('goods', this)">
-                        <span>🎁</span> 盲包周邊收藏
+                        <span class="nav-icon">🎁</span>
+                        <span class="nav-label">盲包周邊收藏</span>
                     </li>
                     <li class="nav-item" onclick="switchTab('budget', this)">
-                        <span>💰</span> 花費與記帳
+                        <span class="nav-icon">💰</span>
+                        <span class="nav-label">花費與記帳</span>
                     </li>
                     <li class="nav-item" onclick="switchTab('calendar', this)">
-                        <span>📅</span> 發售行事曆
+                        <span class="nav-icon">📅</span>
+                        <span class="nav-label">發售行事曆</span>
                     </li>
                 </ul>
             </div>

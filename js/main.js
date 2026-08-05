@@ -285,14 +285,30 @@ async function submitNewItem() {
     }
 }
 
+let sidebarCollapsed = false;
+
 function switchMode(mode) {
     const container = document.getElementById('appContainer');
 
     if (mode === 'web') {
         container.className = 'app-container web-mode';
+        document.querySelector('.sidebar')?.classList.toggle('collapsed', sidebarCollapsed);
     } else {
         container.className = 'app-container mobile-mode';
+        document.querySelector('.sidebar')?.classList.remove('collapsed');
     }
+}
+
+function toggleSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    const toggleBtn = document.querySelector('.sidebar-toggle-btn');
+
+    if (!sidebar || !toggleBtn) return;
+
+    sidebarCollapsed = !sidebarCollapsed;
+    sidebar.classList.toggle('collapsed', sidebarCollapsed);
+    toggleBtn.innerText = sidebarCollapsed ? '⟩' : '⟨';
+    toggleBtn.setAttribute('aria-label', sidebarCollapsed ? '展開側邊欄' : '收合側邊欄');
 }
 
 function switchTab(tabId, element) {
