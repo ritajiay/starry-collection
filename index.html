@@ -7,6 +7,7 @@
     <!-- 引入 Supabase JS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
@@ -88,23 +89,23 @@
 
                 <ul class="nav-menu">
                     <li class="nav-item active" onclick="switchTab('dashboard', this)">
-                        <span class="nav-icon">📊</span>
+                        <span class="nav-icon"><i class="fa-solid fa-sparkles"></i></span>
                         <span class="nav-label">總覽儀表板</span>
                     </li>
                     <li class="nav-item" onclick="switchTab('cards', this)">
-                        <span class="nav-icon">🃏</span>
+                        <span class="nav-icon"><i class="fa-solid fa-book-open"></i></span>
                         <span class="nav-label">動漫卡片圖鑑</span>
                     </li>
                     <li class="nav-item" onclick="switchTab('goods', this)">
-                        <span class="nav-icon">🎁</span>
+                        <span class="nav-icon"><i class="fa-solid fa-gifts"></i></span>
                         <span class="nav-label">盲包周邊收藏</span>
                     </li>
                     <li class="nav-item" onclick="switchTab('budget', this)">
-                        <span class="nav-icon">💰</span>
+                        <span class="nav-icon"><i class="fa-solid fa-wallet"></i></span>
                         <span class="nav-label">花費與記帳</span>
                     </li>
                     <li class="nav-item" onclick="switchTab('calendar', this)">
-                        <span class="nav-icon">📅</span>
+                        <span class="nav-icon"><i class="fa-solid fa-calendar-days"></i></span>
                         <span class="nav-label">發售行事曆</span>
                     </li>
                 </ul>
@@ -215,27 +216,27 @@
         <!-- 手機模式專屬底部導覽列 -->
         <div class="mobile-tabbar">
             <div class="mobile-tab-item active" onclick="switchTab('dashboard', this)">
-                <span class="icon">📊</span>
+                <span class="icon"><i class="fa-solid fa-sparkles"></i></span>
                 <span>總覽</span>
             </div>
             <div class="mobile-tab-item" onclick="switchTab('cards', this)">
-                <span class="icon">🃏</span>
+                <span class="icon"><i class="fa-solid fa-book-open"></i></span>
                 <span>卡片</span>
             </div>
             <div class="mobile-tab-item" onclick="switchTab('goods', this)">
-                <span class="icon">🎁</span>
+                <span class="icon"><i class="fa-solid fa-gifts"></i></span>
                 <span>周邊</span>
             </div>
             <div class="mobile-tab-item" onclick="switchTab('budget', this)">
-                <span class="icon">💰</span>
+                <span class="icon"><i class="fa-solid fa-wallet"></i></span>
                 <span>記帳</span>
             </div>
             <div class="mobile-tab-item" onclick="switchTab('calendar', this)">
-                <span class="icon">📅</span>
+                <span class="icon"><i class="fa-solid fa-calendar-days"></i></span>
                 <span>行事曆</span>
             </div>
             <div class="mobile-tab-item" onclick="handleLogout()">
-                <span class="icon">↩️</span>
+                <span class="icon"><i class="fa-solid fa-right-from-bracket"></i></span>
                 <span>登出</span>
             </div>
         </div>
