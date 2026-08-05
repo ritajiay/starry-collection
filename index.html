@@ -91,11 +91,16 @@
                         <span>📅</span> 發售行事曆
                     </li>
                 </ul>
-                <button class="btn-primary btn-logout" onclick="handleLogout()">登出系統</button>
             </div>
 
             <!-- 主內容區 -->
             <div class="main-content">
+                <div class="main-toolbar">
+                    <button class="topbar-logout-btn" onclick="handleLogout()" aria-label="登出系統">
+                        <span class="icon">↩️</span>
+                        <span>登出</span>
+                    </button>
+                </div>
                 
                 <!-- 1. 總覽儀表板 -->
                 <div id="page-dashboard" class="page-pane active">

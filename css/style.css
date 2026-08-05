@@ -181,6 +181,42 @@ body {
     position: relative;
 }
 
+.main-toolbar {
+    display: none;
+    justify-content: flex-end;
+    padding: 14px 24px 0;
+    flex-shrink: 0;
+}
+
+.topbar-logout-btn {
+    border: 1px solid var(--border-color);
+    background: #ffffff;
+    color: var(--text-main);
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 8px rgba(74, 144, 226, 0.08);
+    transition: all 0.2s ease;
+}
+
+.topbar-logout-btn:hover {
+    background: var(--primary-light);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.app-container.web-mode .main-toolbar {
+    display: flex;
+}
+
+.app-container.mobile-mode .main-toolbar {
+    display: none !important;
+}
+
 .mobile-tabbar {
     display: none;
     background: #ffffff;
@@ -359,15 +395,6 @@ body {
 
 .btn-primary:hover {
     background: var(--primary-hover);
-}
-
-.btn-logout {
-    background: #e74c3c;
-    box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);
-    margin-top: auto;
-}
-.btn-logout:hover {
-    background: #c0392b;
 }
 
 .app-container.mobile-mode .sidebar { display: none !important; }
