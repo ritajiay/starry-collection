@@ -74,6 +74,9 @@ async function fetchCollections() {
     }
 }
 
+// 1. 在外面宣告一個變數記錄目前選中的標籤
+let currentTag = '全部';
+
 function renderData(items) {
     const cardsContainer = document.getElementById('cards-grid-container');
     const goodsContainer = document.getElementById('goods-grid-container');
@@ -81,12 +84,23 @@ function renderData(items) {
     cardsContainer.innerHTML = '';
     goodsContainer.innerHTML = '';
 
-    let totalCount = items.length;
+    // 【新增】動態產生與渲染標籤篩選按鈕列
+    renderTagButtons(items);
+
+    // 【修改】根據目前選中的標籤過濾 items
+    const filteredItems = items.filter(item => {
+        if (currentTag === '全部') return true;
+        const tag = item.tag || '收藏品';
+        return tag === currentTag;
+    });
+
+    let totalCount = filteredItems.length; // 依照篩選後計算數量（如果想維持總數量可改回 items.length）
     let totalPrice = 0;
     let cardHtml = '';
     let goodsHtml = '';
 
-    items.forEach(item => {
+    // 使用過濾後的資料來跑迴圈
+    filteredItems.forEach(item => {
         totalPrice += Number(item.price || 0);
         const tag = item.tag || '收藏品';
         const title = item.title || '無標題';
@@ -94,7 +108,6 @@ function renderData(items) {
         const price = item.price ? `NT$ ${Number(item.price).toLocaleString()}` : '未定';
         const notes = item.notes || '';
 
-        /* 渲染卡片時，如果有 image_url 則顯示真實圖片，沒有則用預設 Emoji 佔位 */
         const imageContent = item.image_url 
             ? `<img src="${item.image_url}" alt="${title}">` 
             : (item.image_emoji || '✨');
@@ -119,8 +132,8 @@ function renderData(items) {
         }
     });
 
-    cardsContainer.innerHTML = cardHtml || '<div style="color: var(--text-sub);">目前還沒有卡片收藏喔！</div>';
-    goodsContainer.innerHTML = goodsHtml || '<div style="color: var(--text-sub);">目前還沒有周邊收藏喔！</div>';
+    cardsContainer.innerHTML = cardHtml || '<div style="color: var(--text-sub);">目前還沒有符合的卡片收藏喔！</div>';
+    goodsContainer.innerHTML = goodsHtml || '<div style="color: var(--text-sub);">目前還沒有符合的周邊收藏喔！</div>';
 
     document.getElementById('stat-total-count').innerText = `${totalCount} 件`;
     document.getElementById('stat-total-price').innerText = `NT$ ${totalPrice.toLocaleString()}`;
@@ -129,6 +142,40 @@ function renderData(items) {
     const percent = Math.min(Math.round((totalPrice / budgetLimit) * 100), 100);
     document.getElementById('budget-desc').innerText = `已花費 NT$ ${totalPrice.toLocaleString()} / 預算 NT$ ${budgetLimit.toLocaleString()} (${percent}%)`;
     document.getElementById('budget-bar').style.width = percent + '%';
+}
+
+/**
+ * 【新增】專門負責產生上方標籤按鈕的輔助函式
+ */
+function renderTagButtons(items) {
+    let tagContainer = document.getElementById('tag-filter-container');
+    
+    // 如果 HTML 中還沒有這個容器，自動幫你在適當地方建立一個（或請自行加在 HTML 中）
+    if (!tagContainer) {
+        tagContainer = document.createElement('div');
+        tagContainer.id = 'tag-filter-container';
+        tagContainer.style.marginBottom = '20px';
+        const cardsContainer = document.getElementById('cards-grid-container');
+        cardsContainer.parentNode.insertBefore(tagContainer, cardsContainer);
+    }
+
+    // 從所有 items 中萃取出不重複的 tag，並加上「全部」
+    const tags = ['全部', ...new Set(items.map(item => item.tag || '收藏品'))];
+
+    tagContainer.innerHTML = tags.map(tag => `
+        <button class="filter-tag-btn ${tag === currentTag ? 'active' : ''}" data-tag="${tag}" style="margin-right: 8px; padding: 6px 14px; border-radius: 16px; border: 1px solid #ddd; cursor: pointer; background: ${tag === currentTag ? 'var(--primary-color, #007bff)' : '#fff'}; color: ${tag === currentTag ? '#fff' : '#333'}">
+            ${tag}
+        </button>
+    `).join('');
+
+    // 綁點擊事件：點擊後更新狀態並重新渲染資料
+    tagContainer.querySelectorAll('.filter-tag-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            currentTag = e.target.getAttribute('data-tag');
+            // 假設你的原始資料全域變數叫做 allItems，請換成你實際儲存資料的變數名稱
+            renderData(window.allItems || items); 
+        });
+    });
 }
 
 /* Modal 互動開關控制 */
