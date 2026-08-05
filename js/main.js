@@ -74,62 +74,42 @@ async function fetchCollections() {
     }
 }
 
-// 1. 在外面宣告一個變數記錄目前選中的標籤
-let currentTag = '全部';
+// 1. 每個頁面獨立記錄目前選中的標籤
+let currentTags = {
+    card: '全部',
+    goods: '全部'
+};
 
 function renderData(items) {
     const cardsContainer = document.getElementById('cards-grid-container');
     const goodsContainer = document.getElementById('goods-grid-container');
-    
+
+    window.allItems = items;
+
     cardsContainer.innerHTML = '';
     goodsContainer.innerHTML = '';
 
-    // 【新增】動態產生與渲染標籤篩選按鈕列
-    renderTagButtons(items);
+    renderTagButtons(items, 'card');
+    renderTagButtons(items, 'goods');
 
-    // 【修改】根據目前選中的標籤過濾 items
-    const filteredItems = items.filter(item => {
-        if (currentTag === '全部') return true;
-        const tag = item.tag || '收藏品';
-        return tag === currentTag;
-    });
+    const filteredCards = getFilteredItems(items, 'card');
+    const filteredGoods = getFilteredItems(items, 'goods');
 
-    let totalCount = filteredItems.length; // 依照篩選後計算數量（如果想維持總數量可改回 items.length）
+    let totalCount = items.length;
     let totalPrice = 0;
     let cardHtml = '';
     let goodsHtml = '';
 
-    // 使用過濾後的資料來跑迴圈
-    filteredItems.forEach(item => {
+    items.forEach(item => {
         totalPrice += Number(item.price || 0);
-        const tag = item.tag || '收藏品';
-        const title = item.title || '無標題';
-        const date = item.date || '2026-12-21';
-        const price = item.price ? `NT$ ${Number(item.price).toLocaleString()}` : '未定';
-        const notes = item.notes || '';
+    });
 
-        const imageContent = item.image_url 
-            ? `<img src="${item.image_url}" alt="${title}">` 
-            : (item.image_emoji || '✨');
+    filteredCards.forEach(item => {
+        cardHtml += buildCollectionCard(item);
+    });
 
-        const cardTemplate = `
-            <div class="collection-card">
-                <div class="card-img-container">${imageContent}</div>
-                <div class="card-info">
-                    <span class="card-tag">${tag}</span>
-                    <div class="card-title">${title}</div>
-                    <div class="card-date">購入日期: ${date}</div>
-                    <div class="card-price">購入: ${price}</div>
-                    <div class="card-notes">備註: ${notes}</div>
-                </div>
-            </div>
-        `;
-
-        if (item.category === 'card') {
-            cardHtml += cardTemplate;
-        } else {
-            goodsHtml += cardTemplate;
-        }
+    filteredGoods.forEach(item => {
+        goodsHtml += buildCollectionCard(item);
     });
 
     cardsContainer.innerHTML = cardHtml || '<div style="color: var(--text-sub);">目前還沒有符合的卡片收藏喔！</div>';
@@ -144,36 +124,71 @@ function renderData(items) {
     document.getElementById('budget-bar').style.width = percent + '%';
 }
 
+function getFilteredItems(items, category) {
+    const selectedTag = currentTags[category] || '全部';
+
+    return items.filter(item => {
+        if (item.category !== category) return false;
+        if (selectedTag === '全部') return true;
+        return (item.tag || '收藏品') === selectedTag;
+    });
+}
+
+function buildCollectionCard(item) {
+    const tag = item.tag || '收藏品';
+    const title = item.title || '無標題';
+    const date = item.date || '2026-12-21';
+    const price = item.price ? `NT$ ${Number(item.price).toLocaleString()}` : '未定';
+    const notes = item.notes || '';
+    const imageContent = item.image_url
+        ? `<img src="${item.image_url}" alt="${title}">`
+        : (item.image_emoji || '✨');
+
+    return `
+        <div class="collection-card">
+            <div class="card-img-container">${imageContent}</div>
+            <div class="card-info">
+                <span class="card-tag">${tag}</span>
+                <div class="card-title">${title}</div>
+                <div class="card-date">購入日期: ${date}</div>
+                <div class="card-price">購入: ${price}</div>
+                <div class="card-notes">備註: ${notes}</div>
+            </div>
+        </div>
+    `;
+}
+
 /**
- * 【新增】專門負責產生上方標籤按鈕的輔助函式
+ * 專門負責產生各頁面上方的標籤按鈕
  */
-function renderTagButtons(items) {
-    let tagContainer = document.getElementById('tag-filter-container');
-    
-    // 如果 HTML 中還沒有這個容器，自動幫你在適當地方建立一個（或請自行加在 HTML 中）
+function renderTagButtons(items, category) {
+    const containerId = category === 'card' ? 'tag-filter-container-cards' : 'tag-filter-container-goods';
+    const gridContainer = category === 'card' ? document.getElementById('cards-grid-container') : document.getElementById('goods-grid-container');
+    let tagContainer = document.getElementById(containerId);
+
     if (!tagContainer) {
         tagContainer = document.createElement('div');
-        tagContainer.id = 'tag-filter-container';
+        tagContainer.id = containerId;
         tagContainer.style.marginBottom = '20px';
-        const cardsContainer = document.getElementById('cards-grid-container');
-        cardsContainer.parentNode.insertBefore(tagContainer, cardsContainer);
+        gridContainer.parentNode.insertBefore(tagContainer, gridContainer);
     }
 
-    // 從所有 items 中萃取出不重複的 tag，並加上「全部」
-    const tags = ['全部', ...new Set(items.map(item => item.tag || '收藏品'))];
+    const categoryItems = items.filter(item => item.category === category);
+    const tags = ['全部', ...new Set(categoryItems.map(item => item.tag || '收藏品'))];
+    const selectedTag = currentTags[category] || '全部';
 
     tagContainer.innerHTML = tags.map(tag => `
-        <button class="filter-tag-btn ${tag === currentTag ? 'active' : ''}" data-tag="${tag}" style="margin-right: 8px; padding: 6px 14px; border-radius: 16px; border: 1px solid #ddd; cursor: pointer; background: ${tag === currentTag ? 'var(--primary-color, #007bff)' : '#fff'}; color: ${tag === currentTag ? '#fff' : '#333'}">
+        <button class="filter-tag-btn ${tag === selectedTag ? 'active' : ''}" data-tag="${tag}" data-category="${category}" style="margin-right: 8px; padding: 6px 14px; border-radius: 16px; border: 1px solid #ddd; cursor: pointer; background: ${tag === selectedTag ? 'var(--primary-color, #007bff)' : '#fff'}; color: ${tag === selectedTag ? '#fff' : '#333'}">
             ${tag}
         </button>
     `).join('');
 
-    // 綁點擊事件：點擊後更新狀態並重新渲染資料
     tagContainer.querySelectorAll('.filter-tag-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            currentTag = e.target.getAttribute('data-tag');
-            // 假設你的原始資料全域變數叫做 allItems，請換成你實際儲存資料的變數名稱
-            renderData(window.allItems || items); 
+            const clickedTag = e.currentTarget.getAttribute('data-tag');
+            const clickedCategory = e.currentTarget.getAttribute('data-category');
+            currentTags[clickedCategory] = clickedTag;
+            renderData(window.allItems || items);
         });
     });
 }
