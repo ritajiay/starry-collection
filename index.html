@@ -90,11 +90,6 @@
                     <li class="nav-item" onclick="switchTab('calendar', this)">
                         <span>📅</span> 發售行事曆
                     </li>
-                    <div class="sidebar-switcher">
-                        <button class="sidebar-switch-btn" onclick="switchMode('mobile')">
-                            <span>📱</span> 切換手機滿版模式
-                        </button>
-                    </div><br>
                 </ul>
                 <button class="btn-primary btn-logout" onclick="handleLogout()">登出系統</button>
             </div>
@@ -216,10 +211,6 @@
             <div class="mobile-tab-item" onclick="switchTab('calendar', this)">
                 <span class="icon">📅</span>
                 <span>行事曆</span>
-            </div>
-            <div class="mobile-tab-item" onclick="switchMode('web')" style="color: var(--primary);">
-                <span class="icon">💻</span>
-                <span>Web版</span>
             </div>
             <div class="mobile-tab-item" onclick="handleLogout()">
                 <span class="icon">↩️</span>

@@ -5,6 +5,7 @@ const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 window.addEventListener('DOMContentLoaded', async () => {
     autoDetectMode();
+    window.addEventListener('resize', debounceAutoDetectMode);
     checkUserSession();
 });
 
@@ -47,6 +48,15 @@ async function handleLogin() {
 async function handleLogout() {
     await _supabase.auth.signOut();
     location.reload();
+}
+
+let resizeTimer = null;
+
+function debounceAutoDetectMode() {
+    window.clearTimeout(resizeTimer);
+    resizeTimer = window.setTimeout(() => {
+        autoDetectMode();
+    }, 120);
 }
 
 function autoDetectMode() {
@@ -277,16 +287,11 @@ async function submitNewItem() {
 
 function switchMode(mode) {
     const container = document.getElementById('appContainer');
-    const btns = document.querySelectorAll('.mode-btn');
-    
-    btns.forEach(btn => btn.classList.remove('active'));
-    
+
     if (mode === 'web') {
         container.className = 'app-container web-mode';
-        if(btns[0]) btns[0].classList.add('active');
     } else {
         container.className = 'app-container mobile-mode';
-        if(btns[1]) btns[1].classList.add('active');
     }
 }
 
@@ -300,11 +305,7 @@ function switchTab(tabId, element) {
     navItems.forEach(item => item.classList.remove('active'));
     
     const mobileTabs = document.querySelectorAll('.mobile-tabbar .mobile-tab-item');
-    mobileTabs.forEach(item => {
-        if(!item.getAttribute('onclick').includes("switchMode")) {
-            item.classList.remove('active');
-        }
-    });
+    mobileTabs.forEach(item => item.classList.remove('active'));
 
     if (element.classList.contains('nav-item')) {
         element.classList.add('active');
@@ -312,7 +313,7 @@ function switchTab(tabId, element) {
         if (index !== -1 && mobileTabs[index]) {
             mobileTabs[index].classList.add('active');
         }
-    } else if (element.classList.contains('mobile-tab-item') && !element.getAttribute('onclick').includes("switchMode")) {
+    } else if (element.classList.contains('mobile-tab-item')) {
         element.classList.add('active');
         const index = Array.from(mobileTabs).indexOf(element);
         if (index !== -1 && navItems[index]) {
