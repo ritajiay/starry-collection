@@ -214,7 +214,7 @@ function closeModal() {
     document.getElementById('uploadModal').style.display = 'none';
 }
 
-/* 新增品項：同時寫入 items 與 transactions 雙表 */
+/* 新增品項：同時寫入 items 與 transactions 雙表（已自動帶入 user_id） */
 async function submitNewItem() {
     const titleInput = document.getElementById('inputTitle').value.trim();
     const categoryInput = document.getElementById('inputCategory').value.trim();
@@ -234,6 +234,15 @@ async function submitNewItem() {
         alert('請輸入收藏名稱！');
         return;
     }
+
+    // 取得當前登入使用者的 UID，確保符合 RLS 政策
+    const { data: { user } } = await _supabase.auth.getUser();
+    if (!user) {
+        alert('尚未登入或登入已過期，請重新登入！');
+        location.reload();
+        return;
+    }
+    const userId = user.id;
 
     let imageUrl = null;
 
@@ -258,7 +267,7 @@ async function submitNewItem() {
         imageUrl = publicUrlData.publicUrl;
     }
 
-    // 1. 寫入 items 資料表
+    // 1. 寫入 items 資料表 (帶入 user_id)
     const { data: insertedItem, error: itemError } = await _supabase
         .from('items')
         .insert([{
@@ -268,7 +277,8 @@ async function submitNewItem() {
             date: dateInput || null,
             price: Number(priceInput) || 0,
             image_url: imageUrl,
-            notes: notesInput || ''
+            notes: notesInput || '',
+            user_id: userId
         }])
         .select()
         .single();
@@ -280,7 +290,7 @@ async function submitNewItem() {
 
     const newItemId = insertedItem.id;
 
-    // 2. 如果狀態是已售出，寫入 transactions 資料表
+    // 2. 如果狀態是已售出，寫入 transactions 資料表 (帶入 user_id)
     if (statusInput === 'sold') {
         const { error: txError } = await _supabase
             .from('transactions')
@@ -288,7 +298,8 @@ async function submitNewItem() {
                 item_id: newItemId,
                 type: 'sold',
                 price: Number(sellPriceInput) || 0,
-                date: sellDateInput || null
+                date: sellDateInput || null,
+                user_id: userId
             }]);
 
         if (txError) {
