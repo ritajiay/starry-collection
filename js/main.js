@@ -337,3 +337,20 @@ function switchTab(tabId, element) {
         }
     }
 }
+
+// 監聽所有 input 與 select 的 focus 事件
+document.addEventListener('DOMContentLoaded', () => {
+    const inputs = document.querySelectorAll('#uploadModal input, #uploadModal select');
+    
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            // 稍微延遲 300 毫秒，等手機鍵盤彈出動畫開始後再執行滾動，定位會更準確
+            setTimeout(() => {
+                this.scrollIntoView({ 
+                    behavior: 'smooth', // 平滑滾動效果
+                    block: 'center'     // 將輸入框對齊到畫面正中央
+                });
+            }, 300);
+        });
+    });
+});
