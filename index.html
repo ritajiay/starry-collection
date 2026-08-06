@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>收藏手帳 ✦ Starry Collection Note</title>
+    <title>收藏手帳 ✦ Collection Note</title>
+    <!-- 引入外部 CSS 樣式檔 -->
+    <link rel="stylesheet" href="./css/style.css">
     <!-- 引入 Supabase JS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
 
@@ -24,33 +25,50 @@
         </div>
     </div>
 
-    <!-- 帶有檔案上傳欄位的新增表單 Modal -->
-    <div id="uploadModal">
+    <!-- 帶有檔案上傳與買賣狀態欄位的新增表單 Modal -->
+    <div id="uploadModal" style="display: none;">
         <div class="modal-card">
-            <h3>✨ 新增收藏品與照片</h3>
+            <h3>✨ 新增收藏品與交易紀錄</h3>
             <div class="form-group">
                 <label>收藏名稱</label>
                 <input type="text" id="inputTitle" placeholder="例如：五條悟壓克力立牌">
             </div>
             <div class="form-group">
-                <label>分類</label>
-                <select id="inputCategory">
-                    <option value="card">🃏 動漫卡片</option>
-                    <option value="goods">🎁 盲包周邊</option>
-                </select>
+                <label>分類（選填）</label>
+                <input type="text" id="inputCategory" placeholder="例如：卡片 / 周邊 / 模型">
             </div>
             <div class="form-group">
                 <label>標籤</label>
                 <input type="text" id="inputTag" placeholder="例如：UR稀有卡 / 盲盒公仔">
             </div>
             <div class="form-group">
+                <label>商品狀態</label>
+                <select id="inputStatus" onchange="toggleSellFields(this.value)">
+                    <option value="holding">🟢 持有中</option>
+                    <option value="sold">🔴 已售出</option>
+                </select>
+            </div>
+            <div class="form-group">
                 <label>購入金額 (NT$)</label>
                 <input type="number" id="inputPrice" placeholder="990">
             </div>
             <div class="form-group">
-                <label>購入日期 (DATE)</label>
-                <input type="date" id="inputDate" placeholder="2026-12-21">
+                <label>購入日期</label>
+                <input type="date" id="inputDate">
             </div>
+
+            <!-- 🔒 動態選填：如果是「已售出」，才需要填寫賣出資訊 -->
+            <div id="soldFieldsContainer" style="display: none; background: #fdf2f2; padding: 12px; border-radius: 8px; margin-bottom: 12px; border: 1px dashed #e74c3c;">
+                <div class="form-group" style="margin-bottom: 10px;">
+                    <label style="color: #c0392b;">售出金額 (NT$)</label>
+                    <input type="number" id="inputSellPrice" placeholder="1500">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label style="color: #c0392b;">售出日期</label>
+                    <input type="date" id="inputSellDate">
+                </div>
+            </div>
+
             <div class="form-group">
                 <label>上傳收藏照片</label>
                 <input type="file" id="inputFile" accept="image/*">
@@ -92,13 +110,9 @@
                         <span class="nav-icon"><i class="fa-solid fa-house"></i></span>
                         <span class="nav-label">總覽儀表板</span>
                     </li>
-                    <li class="nav-item" onclick="switchTab('cards', this)">
-                        <span class="nav-icon"><i class="fa-solid fa-book-open"></i></span>
-                        <span class="nav-label">動漫卡片圖鑑</span>
-                    </li>
-                    <li class="nav-item" onclick="switchTab('goods', this)">
-                        <span class="nav-icon"><i class="fa-solid fa-gifts"></i></span>
-                        <span class="nav-label">盲包周邊收藏</span>
+                    <li class="nav-item" onclick="switchTab('collection', this)">
+                        <span class="nav-icon"><i class="fa-solid fa-box-archive"></i></span>
+                        <span class="nav-label">我的收藏庫</span>
                     </li>
                     <li class="nav-item" onclick="switchTab('budget', this)">
                         <span class="nav-icon"><i class="fa-solid fa-wallet"></i></span>
@@ -123,7 +137,7 @@
                 <!-- 1. 總覽儀表板 -->
                 <div id="page-dashboard" class="page-pane active">
                     <div class="header-title">哈囉，收藏家！👋</div>
-                    <div class="header-subtitle">今天是個適合抽卡、整理周邊的好日子。</div>
+                    <div class="header-subtitle">今天是個適合整理收藏與資產的好日子。</div>
 
                     <div class="stats-grid">
                         <div class="stat-card">
@@ -145,43 +159,36 @@
                             <h3 style="color: var(--primary); margin-bottom: 6px;">快速記錄新收藏</h3>
                             <p style="font-size: 0.85rem; color: var(--text-sub);">馬上點擊下方按鈕上傳照片並新增一筆資料！</p>
                         </div>
-                        <!-- 呼叫開啟 Modal 的函式 -->
                         <button class="btn-primary" style="width: auto;" onclick="openModal()">＋ 新增收藏</button>
                     </div>
                 </div>
 
-                <!-- 2. 動漫卡片圖鑑 -->
-                <div id="page-cards" class="page-pane">
+                <!-- 2. 我的收藏庫 -->
+                <div id="page-collection" class="page-pane">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                         <div>
-                            <div class="header-title">🃏 動漫卡片圖鑑</div>
-                            <div class="header-subtitle">從 Supabase 雲端即時載入的卡片</div>
+                            <div class="header-title">📦 我的收藏庫</div>
+                            <div class="header-subtitle">所有持有中與已售出的收藏品總覽</div>
                         </div>
                         <button class="btn-primary" style="width: auto;" onclick="openModal()">＋ 新增品項</button>
                     </div>
-                    <div class="grid-cards" id="cards-grid-container">
+                    
+                    <!-- 篩選列 -->
+                    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                        <button class="btn-primary" style="width: auto; padding: 6px 14px; font-size: 0.85rem;" onclick="filterCollection('all')">全部</button>
+                        <button class="btn-primary" style="width: auto; padding: 6px 14px; font-size: 0.85rem; background: #27ae60;" onclick="filterCollection('holding')">🟢 持有中</button>
+                        <button class="btn-primary" style="width: auto; padding: 6px 14px; font-size: 0.85rem; background: #e74c3c;" onclick="filterCollection('sold')">🔴 已售出</button>
+                    </div>
+
+                    <div class="grid-cards" id="collection-grid-container">
                         <div style="color: var(--text-sub);">正在從雲端載入資料...</div>
                     </div>
                 </div>
 
-                <!-- 3. 盲包周邊收藏 -->
-                <div id="page-goods" class="page-pane">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <div>
-                            <div class="header-title">🎁 盲包周邊收藏</div>
-                            <div class="header-subtitle">壓克力排、徽章與盲盒紀錄</div>
-                        </div>
-                        <button class="btn-primary" style="width: auto;" onclick="openModal()">＋ 新增周邊</button>
-                    </div>
-                    <div class="grid-cards" id="goods-grid-container">
-                        <div style="color: var(--text-sub);">正在從雲端載入資料...</div>
-                    </div>
-                </div>
-
-                <!-- 4. 花費與記帳 -->
+                <!-- 3. 花費與記帳 -->
                 <div id="page-budget" class="page-pane">
                     <div class="header-title">💰 花費與預算記帳</div>
-                    <div class="header-subtitle">掌握每個月的坑錢包進度</div>
+                    <div class="header-subtitle">掌握每個月的預算進度</div>
                     <div style="background: var(--primary-light); padding: 20px; border-radius: 14px; border: 1px solid var(--border-color); margin-bottom: 20px;">
                         <h3 style="color: var(--primary); margin-bottom: 10px;">雲端記帳總覽</h3>
                         <p style="font-size: 0.9rem; color: var(--text-sub); margin-bottom: 12px;" id="budget-desc">計算中...</p>
@@ -191,10 +198,10 @@
                     </div>
                 </div>
 
-                <!-- 5. 發售行事曆 -->
+                <!-- 4. 發售行事曆 -->
                 <div id="page-calendar" class="page-pane">
                     <div class="header-title">📅 發售與預購行事曆</div>
-                    <div class="header-subtitle">不錯過任何一檔預購與一番賞上市日</div>
+                    <div class="header-subtitle">不錯過任何一檔預購與上市日</div>
                     <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 14px; padding: 20px;">
                         <ul style="list-style: none; display: flex; flex-direction: column; gap: 14px;">
                             <li style="display: flex; gap: 16px; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
@@ -219,13 +226,9 @@
                 <span class="icon"><i class="fa-solid fa-house"></i></span>
                 <span>總覽</span>
             </div>
-            <div class="mobile-tab-item" onclick="switchTab('cards', this)">
-                <span class="icon"><i class="fa-solid fa-book-open"></i></span>
-                <span>卡片</span>
-            </div>
-            <div class="mobile-tab-item" onclick="switchTab('goods', this)">
-                <span class="icon"><i class="fa-solid fa-gifts"></i></span>
-                <span>周邊</span>
+            <div class="mobile-tab-item" onclick="switchTab('collection', this)">
+                <span class="icon"><i class="fa-solid fa-box-archive"></i></span>
+                <span>收藏庫</span>
             </div>
             <div class="mobile-tab-item" onclick="switchTab('budget', this)">
                 <span class="icon"><i class="fa-solid fa-wallet"></i></span>
@@ -242,6 +245,19 @@
         </div>
     </div>
 
+    <!-- 頁面專屬小幫手 JS (表單狀態切換) -->
+    <script>
+        function toggleSellFields(status) {
+            const soldContainer = document.getElementById('soldFieldsContainer');
+            if (status === 'sold') {
+                soldContainer.style.display = 'block';
+            } else {
+                soldContainer.style.display = 'none';
+            }
+        }
+    </script>
+    
+    <!-- 引入外部主 JS 程式碼 -->
     <script src="./js/main.js"></script>
 
 </body>
