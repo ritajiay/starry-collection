@@ -481,11 +481,19 @@ body {
     box-shadow: 0 2px 8px rgba(0,0,0,0.03);
     transition: transform 0.2s, box-shadow 0.2s;
     cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
-.collection-card:hover {
+.collection-card:hover,
+.collection-card:focus-visible {
     transform: translateY(-4px);
     box-shadow: 0 6px 16px rgba(74, 144, 226, 0.15);
+}
+
+.collection-card:active {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(74, 144, 226, 0.18);
 }
 
 /* 卡片圖片容器，支援真實圖片渲染或 Emoji 佔位 */
