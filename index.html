@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>收藏手帳 ✦ Starry Collection Note</title>
+    <title>收藏手帳 ✦ Collection Note</title>
     <!-- 引入外部 CSS 樣式檔 -->
     <link rel="stylesheet" href="./css/style.css">
     <!-- 引入 Supabase JS SDK -->
@@ -163,7 +163,7 @@
                     </div>
                 </div>
 
-                <!-- 2. 我的收藏庫（整合所有買入與已售出商品） -->
+                <!-- 2. 我的收藏庫 -->
                 <div id="page-collection" class="page-pane">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                         <div>
@@ -173,7 +173,7 @@
                         <button class="btn-primary" style="width: auto;" onclick="openModal()">＋ 新增品項</button>
                     </div>
                     
-                    <!-- 篩選列：可以切換 全部 / 持有中 / 已售出 -->
+                    <!-- 篩選列 -->
                     <div style="display: flex; gap: 10px; margin-bottom: 20px;">
                         <button class="btn-primary" style="width: auto; padding: 6px 14px; font-size: 0.85rem;" onclick="filterCollection('all')">全部</button>
                         <button class="btn-primary" style="width: auto; padding: 6px 14px; font-size: 0.85rem; background: #27ae60;" onclick="filterCollection('holding')">🟢 持有中</button>
@@ -245,7 +245,7 @@
         </div>
     </div>
 
-    <!-- 頁面專屬小幫手 JS (例如表單狀態切換) -->
+    <!-- 頁面專屬小幫手 JS (表單狀態切換) -->
     <script>
         function toggleSellFields(status) {
             const soldContainer = document.getElementById('soldFieldsContainer');
