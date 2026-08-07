@@ -5,6 +5,8 @@ const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // 【新增】全域變數：記錄當前使用者操作的群組 ID
 let currentGroupId = null;
+let currentUserId = null;
+let currentUserDisplayName = '收藏家';
 
 window.addEventListener('DOMContentLoaded', async () => {
     autoDetectMode();
@@ -18,12 +20,30 @@ async function checkUserSession() {
     if (session) {
         document.getElementById('authOverlay').style.display = 'none';
         
-        // 【新增】登入後先取得或自動建立使用者的群組
+        await loadCurrentUserProfile();
         await fetchOrCreateUserGroup();
-        
         fetchCollections();
     } else {
         document.getElementById('authOverlay').style.display = 'flex';
+    }
+}
+
+async function loadCurrentUserProfile() {
+    const { data: { user }, error } = await _supabase.auth.getUser();
+    if (error || !user) {
+        return;
+    }
+
+    currentUserId = user.id;
+    currentUserDisplayName = user.user_metadata?.display_name
+        || user.user_metadata?.full_name
+        || user.user_metadata?.name
+        || user.email
+        || '收藏家';
+
+    const greetingEl = document.getElementById('dashboard-greeting');
+    if (greetingEl) {
+        greetingEl.innerText = `哈囉，${currentUserDisplayName}！👋`;
     }
 }
 
@@ -89,7 +109,7 @@ async function handleLogin() {
         msgEl.innerText = '';
         document.getElementById('authOverlay').style.display = 'none';
         
-        // 登入成功後初始化群組並撈取資料
+        await loadCurrentUserProfile();
         await fetchOrCreateUserGroup();
         fetchCollections();
     }
@@ -160,8 +180,11 @@ async function fetchCollections() {
                     const memberItems = itemsData.filter(item => item.user_id === member.user_id);
                     const totalPrice = memberItems.reduce((sum, item) => sum + Number(item.price || 0), 0);
                     const monthlyItems = memberItems.filter(item => isCurrentMonth(item.date || item.created_at || item.updated_at));
+                    const isCurrentUser = member.user_id === currentUserId;
                     return {
+                        userId: member.user_id,
                         account: member.user_id,
+                        displayName: isCurrentUser ? currentUserDisplayName : null,
                         totalPrice,
                         totalCount: memberItems.length,
                         monthlyPrice: monthlyItems.reduce((sum, item) => sum + Number(item.price || 0), 0),
@@ -222,7 +245,9 @@ function renderGroupMemberSummary(memberSummaries) {
     }
 
     container.innerHTML = memberSummaries.map(summary => {
-        const accountLabel = summary.account ? `帳號 ${summary.account.slice(0, 8)}${summary.account.length > 8 ? '...' : ''}` : '未知帳號';
+        const accountLabel = summary.displayName
+            ? (summary.userId === currentUserId ? `你・${summary.displayName}` : summary.displayName)
+            : (summary.account ? `帳號 ${summary.account.slice(0, 8)}${summary.account.length > 8 ? '...' : ''}` : '未知帳號');
         return `
             <div class="group-summary-row">
                 <div class="group-summary-account">${accountLabel}</div>
