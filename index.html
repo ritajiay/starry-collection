@@ -201,9 +201,15 @@
                         <button class="btn-primary" style="width: auto; padding: 6px 14px; font-size: 0.85rem; background: #e74c3c;" onclick="filterCollection('sold')">🔴 已售出</button>
                     </div>
 
+                    <!-- 【修改後】下方的 Tag 快捷篩選列（使用跟上方一致的結構與命名） -->
+                    <div id="tag-filter-container" class="filter-bar tag-filter-bar">
+                        <!-- 這裡會透過 JS 自動動態產生 Tag 按鈕 -->
+                    </div>
+
                     <div class="grid-cards" id="collection-grid-container">
                         <div style="color: var(--text-sub);">正在從雲端載入資料...</div>
                     </div>
+
                 </div>
 
                 <!-- 3. 花費與記帳 -->

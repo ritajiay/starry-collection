@@ -746,3 +746,27 @@ body {
     background: #ffffff;
     box-shadow: 0 0 0 4px rgba(79, 124, 255, 0.12);
 }
+
+/* 1. 確保 Tag 篩選列容器是橫向排列，且不會被強迫換行 */
+.tag-filter-bar {
+    display: flex !important; /* 強制使用 flex */
+    flex-wrap: nowrap !important; /* 禁止換行，確保橫向捲動 */
+    overflow-x: auto !important; /* 啟用橫向捲動 */
+    gap: 8px !important;
+    padding: 10px 0 !important;
+    margin-top: 10px !important;
+    width: 100% !important;
+    -webkit-overflow-scrolling: touch; /* 讓手機捲動更平滑 */
+}
+
+/* 2. 隱藏捲軸，保持美觀 */
+.tag-filter-bar::-webkit-scrollbar {
+    display: none;
+}
+
+/* 3. 確保裡面的按鈕不會被擠壓 */
+.tag-filter-bar .filter-btn {
+    flex: 0 0 auto; /* 防止按鈕被壓縮寬度 */
+    white-space: nowrap; /* 強制文字不換行 */
+    margin: 0 !important; /* 清除可能存在的邊距 */
+}

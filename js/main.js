@@ -626,3 +626,110 @@ if (typeof module !== 'undefined' && module.exports) {
         buildMemberSummaries
     };
 }
+
+// 記錄當前選中的 Tag 篩選，預設為全部 ('all')
+let currentTagFilter = 'all';
+
+// 修改 renderData 函數：加入 Tag 動態按鈕渲染與過濾邏輯
+function renderData(items, memberSummaries = []) {
+    const container = document.getElementById('collection-grid-container');
+    window.allItems = items;
+
+    container.innerHTML = '';
+
+    // 動態產生並渲染 Tag 快捷篩選按鈕
+    renderTagFilters(items);
+
+    // 同時套用「狀態篩選」與「Tag 篩選」
+    const filteredItems = items.filter(item => {
+        const status = item.status || 'holding';
+        const tag = item.tag || '收藏品';
+
+        const matchStatus = (currentStatusFilter === 'all') || (status === currentStatusFilter);
+        const matchTag = (currentTagFilter === 'all') || (tag === currentTagFilter);
+
+        return matchStatus && matchTag;
+    });
+
+    let totalCount = items.length;
+    let totalPrice = 0;
+    let html = '';
+
+    items.forEach(item => {
+        totalPrice += Number(item.price || 0);
+    });
+
+    const monthlyItems = items.filter(item => isCurrentMonth(item.date || item.created_at || item.updated_at));
+    const monthlyCount = monthlyItems.length;
+    const monthlyPrice = monthlyItems.reduce((sum, item) => sum + Number(item.price || 0), 0);
+
+    if (filteredItems.length === 0) {
+        container.innerHTML = '<div style="color: var(--text-sub); grid-column: 1 / -1; text-align: center; padding: 40px;">目前還沒有符合條件的收藏品喔！</div>';
+    } else {
+        filteredItems.forEach(item => {
+            html += buildCollectionCard(item);
+        });
+        container.innerHTML = html;
+    }
+
+    document.getElementById('stat-total-count').innerText = `${totalCount} 件`;
+    document.getElementById('stat-total-price').innerText = formatCurrency(totalPrice);
+    document.getElementById('stat-monthly-count').innerText = `${monthlyCount} 件`;
+    document.getElementById('stat-monthly-price').innerText = formatCurrency(monthlyPrice);
+
+    const budgetLimit = 6000;
+    const percent = Math.min(Math.round((totalPrice / budgetLimit) * 100), 100);
+    const budgetDescEl = document.getElementById('budget-desc');
+    const budgetBarEl = document.getElementById('budget-bar');
+
+    if (budgetDescEl) {
+        budgetDescEl.innerText = `已花費 ${formatCurrency(totalPrice)} / 預算 ${formatCurrency(budgetLimit)} (${percent}%)`;
+    }
+
+    if (budgetBarEl) {
+        budgetBarEl.style.width = percent + '%';
+    }
+
+    renderGroupMemberSummary(memberSummaries);
+}
+
+// 動態生成 Tag 快捷按鈕（按鈕本身套用與上方相同的 .filter-btn）
+function renderTagFilters(items) {
+    const tagContainer = document.getElementById('tag-filter-container');
+    if (!tagContainer) return;
+
+    const tagsSet = new Set();
+    items.forEach(item => {
+        if (item.tag) {
+            tagsSet.add(item.tag);
+        }
+    });
+
+    const uniqueTags = Array.from(tagsSet);
+
+    // 最前面放一個「全部 Tag」按鈕
+    let html = `
+        <button class="filter-btn ${currentTagFilter === 'all' ? 'active' : ''}" onclick="filterByTag('all')">
+            全部 Tag
+        </button>
+    `;
+
+    uniqueTags.forEach(tag => {
+        const isActive = currentTagFilter === tag ? 'active' : '';
+        html += `
+            <button class="filter-btn ${isActive}" onclick="filterByTag('${tag}')">
+                ${tag}
+            </button>
+        `;
+    });
+
+    tagContainer.innerHTML = html;
+}
+
+// 點擊 Tag 按鈕時的觸發函數
+function filterByTag(tag) {
+    currentTagFilter = tag;
+    if (window.allItems) {
+        renderData(window.allItems);
+    }
+}
