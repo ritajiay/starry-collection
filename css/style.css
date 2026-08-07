@@ -575,6 +575,10 @@ body {
 .app-container.mobile-mode .sidebar { display: none !important; }
 .app-container.mobile-mode .mobile-tabbar { display: flex !important; }
 .app-container.mobile-mode .app-layout { flex-direction: column; }
+.app-container.mobile-mode .grid-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
 
 /* 質感高雅的 Modal 彈窗樣式 */
 #uploadModal {
