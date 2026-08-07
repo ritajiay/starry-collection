@@ -3,6 +3,9 @@ const SUPABASE_ANON_KEY = 'sb_publishable_AR7Pmd0Z3uXENSiyFCXHig_tRJQUgIB';
 
 const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+// 【新增】全域變數：記錄當前使用者操作的群組 ID
+let currentGroupId = null;
+
 window.addEventListener('DOMContentLoaded', async () => {
     autoDetectMode();
     window.addEventListener('resize', debounceAutoDetectMode);
@@ -14,9 +17,63 @@ async function checkUserSession() {
     const { data: { session } } = await _supabase.auth.getSession();
     if (session) {
         document.getElementById('authOverlay').style.display = 'none';
+        
+        // 【新增】登入後先取得或自動建立使用者的群組
+        await fetchOrCreateUserGroup();
+        
         fetchCollections();
     } else {
         document.getElementById('authOverlay').style.display = 'flex';
+    }
+}
+
+// 【新增】檢查使用者群組，若沒有則自動幫他建立一個預設群組（解決沒設定群組的問題）
+async function fetchOrCreateUserGroup() {
+    const { data: { user } } = await _supabase.auth.getUser();
+    if (!user) return;
+
+    // 1. 查詢使用者所屬的群組
+    const { data: members, error } = await _supabase
+        .from('group_members')
+        .select('group_id, groups(name)')
+        .eq('user_id', user.id);
+
+    if (error) {
+        console.error('取得群組失敗:', error);
+        return;
+    }
+
+    if (members && members.length > 0) {
+        // 如果已經有群組，預設使用第一個
+        currentGroupId = members[0].group_id;
+        console.log('當前群組 ID:', currentGroupId);
+    } else {
+        // 2. 如果沒有群組，自動幫他建立一個預設群組
+        console.log('偵測到無群組，正在建立預設群組...');
+        
+        const { data: newGroup, error: groupError } = await _supabase
+            .from('groups')
+            .insert([{ name: '我的專屬記帳本' }])
+            .select()
+            .single();
+
+        if (groupError) {
+            alert('自動建立群組失敗: ' + groupError.message);
+            return;
+        }
+
+        // 將自己加入這個新群組
+        const { error: memberError } = await _supabase
+            .from('group_members')
+            .insert([{ group_id: newGroup.id, user_id: user.id }]);
+
+        if (memberError) {
+            alert('加入群組失敗: ' + memberError.message);
+            return;
+        }
+
+        currentGroupId = newGroup.id;
+        console.log('已自動建立並加入新群組 ID:', currentGroupId);
     }
 }
 
@@ -42,6 +99,9 @@ async function handleLogin() {
     } else {
         msgEl.innerText = '';
         document.getElementById('authOverlay').style.display = 'none';
+        
+        // 登入成功後初始化群組並撈取資料
+        await fetchOrCreateUserGroup();
         fetchCollections();
     }
 }
@@ -68,28 +128,34 @@ function autoDetectMode() {
     }
 }
 
-// 同時從 items 與 transactions 撈取資料進行整合
+// 同時從 items 與 transactions 撈取資料進行整合（已加上 group_id 過濾）
 async function fetchCollections() {
+    if (!currentGroupId) {
+        document.getElementById('stat-db-status').innerText = '無群組 ⚠️';
+        return;
+    }
+
     try {
-        // 1. 抓取 items
+        // 1. 抓取 items（加上 group_id 限制）
         const { data: itemsData, error: itemsError } = await _supabase
             .from('items')
             .select('*')
+            .eq('group_id', currentGroupId)
             .order('id', { ascending: false });
 
         if (itemsError) throw itemsError;
 
-        // 2. 抓取 transactions
+        // 2. 抓取 transactions（加上 group_id 限制）
         const { data: txData, error: txError } = await _supabase
             .from('transactions')
-            .select('*');
+            .select('*')
+            .eq('group_id', currentGroupId);
 
         if (txError) throw txError;
 
         // 將 transactions 根據 item_id 對應回去合併
         const combinedData = itemsData.map(item => {
             const itemTxs = txData.filter(tx => tx.item_id === item.id);
-            // 找出是否有售出紀錄
             const soldTx = itemTxs.find(tx => tx.type === 'sold' || tx.status === 'sold');
             return {
                 ...item,
@@ -214,7 +280,7 @@ function closeModal() {
     document.getElementById('uploadModal').style.display = 'none';
 }
 
-/* 新增品項：同時寫入 items 與 transactions 雙表（已自動帶入 user_id） */
+/* 新增品項：同時寫入 items 與 transactions 雙表（已自動帶入 user_id 與 group_id） */
 async function submitNewItem() {
     const titleInput = document.getElementById('inputTitle').value.trim();
     const categoryInput = document.getElementById('inputCategory').value.trim();
@@ -235,7 +301,12 @@ async function submitNewItem() {
         return;
     }
 
-    // 取得當前登入使用者的 UID，確保符合 RLS 政策
+    if (!currentGroupId) {
+        alert('尚未設定群組，無法新增！');
+        return;
+    }
+
+    // 取得當前登入使用者的 UID
     const { data: { user } } = await _supabase.auth.getUser();
     if (!user) {
         alert('尚未登入或登入已過期，請重新登入！');
@@ -267,7 +338,7 @@ async function submitNewItem() {
         imageUrl = publicUrlData.publicUrl;
     }
 
-    // 1. 寫入 items 資料表 (帶入 user_id)
+    // 1. 寫入 items 資料表 (帶入 user_id 與 group_id)
     const { data: insertedItem, error: itemError } = await _supabase
         .from('items')
         .insert([{
@@ -278,7 +349,8 @@ async function submitNewItem() {
             price: Number(priceInput) || 0,
             image_url: imageUrl,
             notes: notesInput || '',
-            user_id: userId
+            user_id: userId,
+            group_id: currentGroupId // 【群組核心】
         }])
         .select()
         .single();
@@ -290,7 +362,7 @@ async function submitNewItem() {
 
     const newItemId = insertedItem.id;
 
-    // 2. 如果狀態是已售出，寫入 transactions 資料表 (帶入 user_id)
+    // 2. 如果狀態是已售出，寫入 transactions 資料表 (帶入 user_id 與 group_id)
     if (statusInput === 'sold') {
         const { error: txError } = await _supabase
             .from('transactions')
@@ -299,7 +371,8 @@ async function submitNewItem() {
                 type: 'sold',
                 price: Number(sellPriceInput) || 0,
                 date: sellDateInput || null,
-                user_id: userId
+                user_id: userId,
+                group_id: currentGroupId // 【群組核心】
             }]);
 
         if (txError) {
