@@ -1,19 +1,23 @@
 const SUPABASE_URL = 'https://wpxrncmhaiwkohegbxdv.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_AR7Pmd0Z3uXENSiyFCXHig_tRJQUgIB';
 
-const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const _supabase = typeof window !== 'undefined' && window.supabase
+    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    : null;
 
 // 【新增】全域變數：記錄當前使用者操作的群組 ID
 let currentGroupId = null;
 let currentUserId = null;
 let currentUserDisplayName = '收藏家';
 
-window.addEventListener('DOMContentLoaded', async () => {
-    autoDetectMode();
-    window.addEventListener('resize', debounceAutoDetectMode);
-    checkUserSession();
-    initInputFocusScroll(); // 綁定輸入框彈出鍵盤時自動捲動的功能
-});
+if (typeof window !== 'undefined') {
+    window.addEventListener('DOMContentLoaded', async () => {
+        autoDetectMode();
+        window.addEventListener('resize', debounceAutoDetectMode);
+        checkUserSession();
+        initInputFocusScroll(); // 綁定輸入框彈出鍵盤時自動捲動的功能
+    });
+}
 
 async function checkUserSession() {
     const { data: { session } } = await _supabase.auth.getSession();
@@ -137,6 +141,47 @@ function autoDetectMode() {
     }
 }
 
+function buildMemberSummaries({ memberRows = [], itemsData = [], currentUserId = null, currentUserDisplayName = '收藏家' }) {
+    const seenUserIds = new Set();
+
+    if (Array.isArray(memberRows)) {
+        memberRows.forEach(member => {
+            if (member?.user_id) {
+                seenUserIds.add(member.user_id);
+            }
+        });
+    }
+
+    if (Array.isArray(itemsData)) {
+        itemsData.forEach(item => {
+            if (item?.user_id) {
+                seenUserIds.add(item.user_id);
+            }
+        });
+    }
+
+    return Array.from(seenUserIds).map(userId => {
+        const memberItems = itemsData.filter(item => item.user_id === userId);
+        const totalPrice = memberItems.reduce((sum, item) => sum + Number(item.price || 0), 0);
+        const monthlyItems = memberItems.filter(item => isCurrentMonth(item.date || item.created_at || item.updated_at));
+        const isCurrentUser = userId === currentUserId;
+
+        return {
+            userId,
+            account: userId,
+            displayName: isCurrentUser ? currentUserDisplayName : null,
+            totalPrice,
+            totalCount: memberItems.length,
+            monthlyPrice: monthlyItems.reduce((sum, item) => sum + Number(item.price || 0), 0),
+            monthlyCount: monthlyItems.length
+        };
+    }).sort((a, b) => {
+        if (a.userId === currentUserId) return -1;
+        if (b.userId === currentUserId) return 1;
+        return a.userId.localeCompare(b.userId);
+    });
+}
+
 // 同時從 items 與 transactions 撈取資料進行整合（已加上 group_id 過濾）
 async function fetchCollections() {
     if (!currentGroupId) {
@@ -175,25 +220,20 @@ async function fetchCollections() {
                 .select('user_id')
                 .eq('group_id', currentGroupId);
 
-            if (!memberError && memberRows) {
-                memberSummaries = memberRows.map(member => {
-                    const memberItems = itemsData.filter(item => item.user_id === member.user_id);
-                    const totalPrice = memberItems.reduce((sum, item) => sum + Number(item.price || 0), 0);
-                    const monthlyItems = memberItems.filter(item => isCurrentMonth(item.date || item.created_at || item.updated_at));
-                    const isCurrentUser = member.user_id === currentUserId;
-                    return {
-                        userId: member.user_id,
-                        account: member.user_id,
-                        displayName: isCurrentUser ? currentUserDisplayName : null,
-                        totalPrice,
-                        totalCount: memberItems.length,
-                        monthlyPrice: monthlyItems.reduce((sum, item) => sum + Number(item.price || 0), 0),
-                        monthlyCount: monthlyItems.length
-                    };
-                });
-            }
+            memberSummaries = buildMemberSummaries({
+                memberRows: !memberError ? memberRows : [],
+                itemsData,
+                currentUserId,
+                currentUserDisplayName
+            });
         } catch (memberStatsError) {
             console.warn('取得群組成員統計失敗:', memberStatsError);
+            memberSummaries = buildMemberSummaries({
+                memberRows: [],
+                itemsData,
+                currentUserId,
+                currentUserDisplayName
+            });
         }
 
         // 將 transactions 根據 item_id 對應回去合併
@@ -579,4 +619,10 @@ function initInputFocusScroll() {
             }, 300);
         });
     });
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        buildMemberSummaries
+    };
 }
