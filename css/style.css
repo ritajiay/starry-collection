@@ -556,7 +556,7 @@ body {
 
 .grid-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 18px;
 }
 
@@ -659,9 +659,25 @@ body {
 .app-container.mobile-mode .sidebar { display: none !important; }
 .app-container.mobile-mode .mobile-tabbar { display: flex !important; }
 .app-container.mobile-mode .app-layout { flex-direction: column; }
-.app-container.mobile-mode .grid-cards {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
+
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .grid-cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .group-summary-values {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .page-pane {
+        padding: 16px;
+    }
 }
 
 /* 質感高雅的 Modal 彈窗樣式 */
