@@ -470,6 +470,77 @@ body {
     color: var(--primary);
 }
 
+.dashboard-group-panel {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 10px 24px rgba(79, 124, 255, 0.06);
+}
+
+.dashboard-group-header {
+    margin-bottom: 16px;
+}
+
+.dashboard-group-header h3 {
+    color: var(--primary);
+    margin-bottom: 6px;
+}
+
+.dashboard-group-header p {
+    font-size: 0.9rem;
+    color: var(--text-sub);
+}
+
+.group-summary-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.group-summary-row {
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 14px;
+    background: linear-gradient(135deg, #f8fbff 0%, #f1f6ff 100%);
+}
+
+.group-summary-account {
+    font-weight: 800;
+    color: var(--text-main);
+    margin-bottom: 10px;
+}
+
+.group-summary-values {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+}
+
+.group-summary-pill {
+    background: #ffffff;
+    border: 1px solid rgba(79, 124, 255, 0.16);
+    border-radius: 12px;
+    padding: 10px;
+}
+
+.group-summary-pill .label {
+    font-size: 0.72rem;
+    color: var(--text-sub);
+    margin-bottom: 4px;
+}
+
+.group-summary-pill .value {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--primary);
+}
+
+.group-summary-empty {
+    color: var(--text-sub);
+    padding: 12px 0;
+}
+
 .grid-cards {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));

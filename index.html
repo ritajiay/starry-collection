@@ -149,17 +149,37 @@
                             <div class="value" style="color: #e67e22;" id="stat-total-price">讀取中...</div>
                         </div>
                         <div class="stat-card">
+                            <h4>本月收藏品項</h4>
+                            <div class="value" id="stat-monthly-count">讀取中...</div>
+                        </div>
+                        <div class="stat-card">
+                            <h4>本月總花費</h4>
+                            <div class="value" style="color: #e67e22;" id="stat-monthly-price">讀取中...</div>
+                        </div>
+                        <div class="stat-card">
                             <h4>雲端狀態</h4>
                             <div class="value" style="font-size: 1rem; color: #27ae60;" id="stat-db-status">連線中...</div>
                         </div>
                     </div>
 
-                    <div style="background: var(--primary-light); padding: 20px; border-radius: 14px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                    <div style="background: var(--primary-light); padding: 20px; border-radius: 14px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                         <div>
                             <h3 style="color: var(--primary); margin-bottom: 6px;">快速記錄新收藏</h3>
                             <p style="font-size: 0.85rem; color: var(--text-sub);">馬上點擊下方按鈕上傳照片並新增一筆資料！</p>
                         </div>
                         <button class="btn-primary" style="width: auto;" onclick="openModal()">＋ 新增收藏</button>
+                    </div>
+
+                    <div class="dashboard-group-panel">
+                        <div class="dashboard-group-header">
+                            <div>
+                                <h3>群組成員統計</h3>
+                                <p>查看目前這個群組中，各帳號的總花費、總收集與本月統計</p>
+                            </div>
+                        </div>
+                        <div id="group-member-summary-list" class="group-summary-list">
+                            <div class="group-summary-empty">載入中...</div>
+                        </div>
                     </div>
                 </div>
 

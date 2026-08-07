@@ -121,6 +121,11 @@ function autoDetectMode() {
 async function fetchCollections() {
     if (!currentGroupId) {
         document.getElementById('stat-db-status').innerText = '無群組 ⚠️';
+        document.getElementById('stat-total-count').innerText = '0 件';
+        document.getElementById('stat-total-price').innerText = formatCurrency(0);
+        document.getElementById('stat-monthly-count').innerText = '0 件';
+        document.getElementById('stat-monthly-price').innerText = formatCurrency(0);
+        renderGroupMemberSummary([]);
         return;
     }
 
@@ -142,6 +147,32 @@ async function fetchCollections() {
 
         if (txError) throw txError;
 
+        // 3. 取得群組成員清單，並建立各帳號統計
+        let memberSummaries = [];
+        try {
+            const { data: memberRows, error: memberError } = await _supabase
+                .from('group_members')
+                .select('user_id')
+                .eq('group_id', currentGroupId);
+
+            if (!memberError && memberRows) {
+                memberSummaries = memberRows.map(member => {
+                    const memberItems = itemsData.filter(item => item.user_id === member.user_id);
+                    const totalPrice = memberItems.reduce((sum, item) => sum + Number(item.price || 0), 0);
+                    const monthlyItems = memberItems.filter(item => isCurrentMonth(item.date || item.created_at || item.updated_at));
+                    return {
+                        account: member.user_id,
+                        totalPrice,
+                        totalCount: memberItems.length,
+                        monthlyPrice: monthlyItems.reduce((sum, item) => sum + Number(item.price || 0), 0),
+                        monthlyCount: monthlyItems.length
+                    };
+                });
+            }
+        } catch (memberStatsError) {
+            console.warn('取得群組成員統計失敗:', memberStatsError);
+        }
+
         // 將 transactions 根據 item_id 對應回去合併
         const combinedData = itemsData.map(item => {
             const itemTxs = txData.filter(tx => tx.item_id === item.id);
@@ -156,7 +187,7 @@ async function fetchCollections() {
         });
 
         document.getElementById('stat-db-status').innerText = '連線正常 ✨';
-        renderData(combinedData);
+        renderData(combinedData, memberSummaries);
     } catch (err) {
         console.error('讀取失敗:', err);
         document.getElementById('stat-db-status').innerText = '連線失敗 ⚠️';
@@ -165,7 +196,60 @@ async function fetchCollections() {
 
 let currentStatusFilter = 'all';
 
-function renderData(items) {
+function formatCurrency(value) {
+    return `NT$ ${Number(value || 0).toLocaleString()}`;
+}
+
+function getMonthKey(value) {
+    if (!value) return null;
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return null;
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+}
+
+function isCurrentMonth(value) {
+    const currentMonthKey = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
+    return getMonthKey(value) === currentMonthKey;
+}
+
+function renderGroupMemberSummary(memberSummaries) {
+    const container = document.getElementById('group-member-summary-list');
+    if (!container) return;
+
+    if (!memberSummaries || memberSummaries.length === 0) {
+        container.innerHTML = '<div class="group-summary-empty">目前這個群組還沒有成員資料。</div>';
+        return;
+    }
+
+    container.innerHTML = memberSummaries.map(summary => {
+        const accountLabel = summary.account ? `帳號 ${summary.account.slice(0, 8)}${summary.account.length > 8 ? '...' : ''}` : '未知帳號';
+        return `
+            <div class="group-summary-row">
+                <div class="group-summary-account">${accountLabel}</div>
+                <div class="group-summary-values">
+                    <div class="group-summary-pill">
+                        <div class="label">總花費</div>
+                        <div class="value">${formatCurrency(summary.totalPrice)}</div>
+                    </div>
+                    <div class="group-summary-pill">
+                        <div class="label">總收集</div>
+                        <div class="value">${summary.totalCount} 件</div>
+                    </div>
+                    <div class="group-summary-pill">
+                        <div class="label">當月總花費</div>
+                        <div class="value">${formatCurrency(summary.monthlyPrice)}</div>
+                    </div>
+                    <div class="group-summary-pill">
+                        <div class="label">當月總收集</div>
+                        <div class="value">${summary.monthlyCount} 件</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function renderData(items, memberSummaries = []) {
     const container = document.getElementById('collection-grid-container');
     window.allItems = items;
 
@@ -185,6 +269,10 @@ function renderData(items) {
         totalPrice += Number(item.price || 0);
     });
 
+    const monthlyItems = items.filter(item => isCurrentMonth(item.date || item.created_at || item.updated_at));
+    const monthlyCount = monthlyItems.length;
+    const monthlyPrice = monthlyItems.reduce((sum, item) => sum + Number(item.price || 0), 0);
+
     if (filteredItems.length === 0) {
         container.innerHTML = '<div style="color: var(--text-sub); grid-column: 1 / -1; text-align: center; padding: 40px;">目前還沒有符合條件的收藏品喔！</div>';
     } else {
@@ -195,12 +283,24 @@ function renderData(items) {
     }
 
     document.getElementById('stat-total-count').innerText = `${totalCount} 件`;
-    document.getElementById('stat-total-price').innerText = `NT$ ${totalPrice.toLocaleString()}`;
+    document.getElementById('stat-total-price').innerText = formatCurrency(totalPrice);
+    document.getElementById('stat-monthly-count').innerText = `${monthlyCount} 件`;
+    document.getElementById('stat-monthly-price').innerText = formatCurrency(monthlyPrice);
 
     const budgetLimit = 6000;
     const percent = Math.min(Math.round((totalPrice / budgetLimit) * 100), 100);
-    document.getElementById('budget-desc').innerText = `已花費 NT$ ${totalPrice.toLocaleString()} / 預算 NT$ ${budgetLimit.toLocaleString()} (${percent}%)`;
-    document.getElementById('budget-bar').style.width = percent + '%';
+    const budgetDescEl = document.getElementById('budget-desc');
+    const budgetBarEl = document.getElementById('budget-bar');
+
+    if (budgetDescEl) {
+        budgetDescEl.innerText = `已花費 ${formatCurrency(totalPrice)} / 預算 ${formatCurrency(budgetLimit)} (${percent}%)`;
+    }
+
+    if (budgetBarEl) {
+        budgetBarEl.style.width = percent + '%';
+    }
+
+    renderGroupMemberSummary(memberSummaries);
 }
 
 function filterCollection(status) {
