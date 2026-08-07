@@ -333,9 +333,18 @@ body {
 
 .main-toolbar {
     display: none;
-    justify-content: flex-end;
-    padding: 14px 24px 0;
-    flex-shrink: 0;
+}
+
+.dashboard-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.dashboard-text-block {
+    flex: 1;
 }
 
 .topbar-logout-btn {
@@ -366,6 +375,10 @@ body {
 
 .app-container.mobile-mode .main-toolbar {
     display: none !important;
+}
+
+.app-container.mobile-mode .dashboard-topbar .topbar-logout-btn {
+    display: none;
 }
 
 .mobile-tabbar {
@@ -440,7 +453,7 @@ body {
 .header-subtitle {
     font-size: 0.9rem;
     color: var(--text-sub);
-    margin-bottom: 24px;
+    margin-bottom: 0;
 }
 
 .stats-grid {

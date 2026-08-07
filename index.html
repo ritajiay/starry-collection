@@ -127,17 +127,18 @@
 
             <!-- 主內容區 -->
             <div class="main-content">
-                <div class="main-toolbar">
-                    <button class="topbar-logout-btn" onclick="handleLogout()" aria-label="登出系統">
-                        <span class="icon"><i class="fa-solid fa-right-from-bracket"></i></span>
-                        <span>登出</span>
-                    </button>
-                </div>
-                
                 <!-- 1. 總覽儀表板 -->
                 <div id="page-dashboard" class="page-pane active">
-                    <div class="header-title" id="dashboard-greeting">哈囉，收藏家！👋</div>
-                    <div class="header-subtitle">今天是個適合整理收藏與資產的好日子。</div>
+                    <div class="dashboard-topbar">
+                        <div class="dashboard-text-block">
+                            <div class="header-title" id="dashboard-greeting">哈囉，收藏家！👋</div>
+                            <div class="header-subtitle">今天是個適合整理收藏與資產的好日子。</div>
+                        </div>
+                        <button class="topbar-logout-btn" onclick="handleLogout()" aria-label="登出系統">
+                            <span class="icon"><i class="fa-solid fa-right-from-bracket"></i></span>
+                            <span>登出</span>
+                        </button>
+                    </div>
 
                     <div class="stats-grid">
                         <div class="stat-card">
