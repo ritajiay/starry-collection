@@ -27,12 +27,15 @@ async function checkUserSession() {
     }
 }
 
-// 【新增】檢查使用者群組，若沒有則自動幫他建立一個預設群組（解決沒設定群組的問題）
 async function fetchOrCreateUserGroup() {
+    // 1. 確保這裡有抓到使用者，且已經成功登入
     const { data: { user } } = await _supabase.auth.getUser();
-    if (!user) return;
+    if (!user) {
+        console.log('尚未登入，無法建立群組');
+        return;
+    }
 
-    // 1. 查詢使用者所屬的群組
+    // 2. 先查詢使用者所屬的群組
     const { data: members, error } = await _supabase
         .from('group_members')
         .select('group_id, groups(name)')
@@ -44,35 +47,21 @@ async function fetchOrCreateUserGroup() {
     }
 
     if (members && members.length > 0) {
-        // 如果已經有群組，預設使用第一個
         currentGroupId = members[0].group_id;
         console.log('當前群組 ID:', currentGroupId);
     } else {
-        // 2. 如果沒有群組，自動幫他建立一個預設群組
-        console.log('偵測到無群組，正在建立預設群組...');
+        console.log('偵測到無群組，正在透過 RPC 建立預設群組...');
         
-        const { data: newGroup, error: groupError } = await _supabase
-            .from('groups')
-            .insert([{ name: '我的專屬記帳本' }])
-            .select()
-            .single();
+        // 3. 呼叫 RPC
+        const { data: newGroupId, error: rpcError } = await _supabase
+            .rpc('create_default_group_for_user');
 
-        if (groupError) {
-            alert('自動建立群組失敗: ' + groupError.message);
+        if (rpcError) {
+            alert('自動建立群組失敗: ' + rpcError.message);
             return;
         }
 
-        // 將自己加入這個新群組
-        const { error: memberError } = await _supabase
-            .from('group_members')
-            .insert([{ group_id: newGroup.id, user_id: user.id }]);
-
-        if (memberError) {
-            alert('加入群組失敗: ' + memberError.message);
-            return;
-        }
-
-        currentGroupId = newGroup.id;
+        currentGroupId = newGroupId;
         console.log('已自動建立並加入新群組 ID:', currentGroupId);
     }
 }
