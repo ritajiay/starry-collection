@@ -20,7 +20,7 @@
             <p>這是您的私人空間，請先登入以解鎖手帳內容。</p>
             <input type="email" id="emailInput" class="auth-input" placeholder="請輸入您的 Email">
             <input type="password" id="passwordInput" class="auth-input" placeholder="請輸入您的密碼">
-            <button class="btn-primary" onclick="handleLogin()">登入解鎖手帳</button>
+            <button id="loginBtn" class="btn-primary">登入解鎖手帳</button>
             <div id="authMessage" style="font-size: 0.85rem; color: #e74c3c; margin-top: 12px;"></div>
         </div>
     </div>
@@ -279,7 +279,7 @@
     </script>
     
     <!-- 引入外部主 JS 程式碼 -->
-    <script src="./js/main.js"></script>
+    <script type="module" src="./js/main.js"></script>
 
 </body>
 </html>

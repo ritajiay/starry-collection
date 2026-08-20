@@ -1,9 +1,4 @@
-const SUPABASE_URL = 'https://wpxrncmhaiwkohegbxdv.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_AR7Pmd0Z3uXENSiyFCXHig_tRJQUgIB';
-
-const _supabase = typeof window !== 'undefined' && window.supabase
-    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-    : null;
+import { _supabase } from "./supabaseClient.js"; // 連線設定
 
 // 【新增】全域變數：記錄當前使用者操作的群組 ID
 let currentGroupId = null;
@@ -89,6 +84,9 @@ async function fetchOrCreateUserGroup() {
         console.log('已自動建立並加入新群組 ID:', currentGroupId);
     }
 }
+
+// 綁登入事件
+document.getElementById('loginBtn').addEventListener('click', handleLogin);
 
 async function handleLogin() {
     const email = document.getElementById('emailInput').value.trim();
