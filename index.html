@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>收藏手帳 ✦ Collection Note</title>
     <!-- 引入外部 CSS 樣式檔 -->
-    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/main.css">
     <!-- 引入 Supabase JS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
@@ -134,7 +134,7 @@
                             <div class="header-title" id="dashboard-greeting">哈囉，收藏家！👋</div>
                             <div class="header-subtitle">今天是個適合整理收藏與資產的好日子。</div>
                         </div>
-                        <button class="topbar-logout-btn" onclick="handleLogout()" aria-label="登出系統">
+                        <button class="topbar-logout-btn logoutBtn" aria-label="登出系統">
                             <span class="icon"><i class="fa-solid fa-right-from-bracket"></i></span>
                             <span>登出</span>
                         </button>
@@ -259,7 +259,7 @@
                 <span class="icon"><i class="fa-solid fa-calendar-days"></i></span>
                 <span>行事曆</span>
             </div>
-            <div class="mobile-tab-item" onclick="handleLogout()">
+            <div class="mobile-tab-item logoutBtn">
                 <span class="icon"><i class="fa-solid fa-right-from-bracket"></i></span>
                 <span>登出</span>
             </div>

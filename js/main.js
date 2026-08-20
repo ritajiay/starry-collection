@@ -117,6 +117,11 @@ async function handleLogin() {
     }
 }
 
+// 綁定所有登出按鈕事件
+document.querySelectorAll('.logoutBtn').forEach(button => {
+    button.addEventListener('click', handleLogout);
+});
+
 async function handleLogout() {
     await _supabase.auth.signOut();
     location.reload();
